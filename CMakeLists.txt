@@ -9,6 +9,7 @@ set(SOURCES
 	"src/main.cpp"
 	"src/callbacks.cpp"
 	"src/key_input.cpp"
+	"src/shader.cpp"
 )
 add_subdirectory(
 	"vendor/"

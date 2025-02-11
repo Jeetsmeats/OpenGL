@@ -2,7 +2,7 @@
  * @Author: Gunjeet Singh
  * @Date:   2025-01-29 18:39:11
  * @Last Modified by:   Your name
- * @Last Modified time: 2025-02-11 16:40:52
+ * @Last Modified time: 2025-02-12 10:00:22
  */
 #include <iostream>
 #include <glad/glad.h>
@@ -10,31 +10,12 @@
 
 #include "callbacks.h"
 #include "key_input.h"
+#include "shader.h"
 
 using namespace std;
 
 #define SCREEN_WIDTH 600
 #define SCREEN_HEIGHT 800
-
-const char *vertexShaderSource =
-    "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "layout (location = 1) in vec3 aColor;"
-    "out vec3 ourColor;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "   ourColor = aColor;\n"
-    "}\0";
-
-const char *fragmentShaderSource =
-    "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "in vec3 ourColor;\n"
-    "void main()\n"
-    "{\n"
-    "   FragColor = vec4(ourColor, 1.0);\n"
-    "}\n\0";
 
 int main(int argc, char **argv)
 {
@@ -51,7 +32,8 @@ int main(int argc, char **argv)
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-    if (window == NULL) {                           // window not found
+    if (window == NULL) // window not found
+    {                           
         cout << "Failed to create a GLFW window" << endl;
         glfwTerminate();
         return -1;
@@ -63,7 +45,8 @@ int main(int argc, char **argv)
     // set the frame buffer resizing callback function to window
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     
-    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
+    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) 
+    {
         cout << "Failed to initialise GLAD" << endl;
         return -1;
     }
@@ -71,64 +54,9 @@ int main(int argc, char **argv)
     // set viewport parameters
     glViewport(0, 0, 800, 600);
 
-    // create the vertex shader
-    unsigned int vertexShader;
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    // attach vertex source shader to vertex shader
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    // compile shader
-    glCompileShader(vertexShader);
-    
-    // check vertex shader compilation for errors
-    int success;
-    char infoLog[512];
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success) {                     // return failed status
-
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        cout <<  "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" <<
-            infoLog << endl;
-    }
-
-    // create the fragment shader
-    unsigned int fragmentShader;
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    // attached fragment shader source to fragment shader
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    // compile the fragment shader
-    glCompileShader(fragmentShader);
-
-    // check fragment shader compilation for errors
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success) {                         // return failed status
-
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << endl;
-    }
-
-    // set up the shader program
-    unsigned int shaderProgram;
-    shaderProgram = glCreateProgram();
-    
-    // attach shaders to the program
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    // link shaders
-    glLinkProgram(shaderProgram);
-    
-    //check linking error status
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success) {                             // return failed status
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << endl;
-    }
-
-    // activate shader program
-    glUseProgram(shaderProgram);
-
-    // delete shader objectss
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    // create the shader program
+    Shader ourShader("shaders/shader.vs", "shaders/shader.fs");
+    ourShader.use();                        // activate program
 
     float vertices[] = {
         // First triangle
@@ -180,9 +108,9 @@ int main(int argc, char **argv)
     glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
     cout << "Maximum supported vertex attributes: " << nrAttributes << endl;
 
-    glUseProgram(shaderProgram);
-    while (!glfwWindowShouldClose(window)) {
-
+    ourShader.use();
+    while (!glfwWindowShouldClose(window)) 
+    {
         processInput(window);           // key inputs
         
         // rendering commands
@@ -199,8 +127,8 @@ int main(int argc, char **argv)
 
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-    glDeleteProgram(shaderProgram);
-
+    ourShader.deleteShader();
+    
     glfwTerminate();
     return 0;
 }
