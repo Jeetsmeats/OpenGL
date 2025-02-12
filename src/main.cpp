@@ -2,7 +2,7 @@
  * @Author: Gunjeet Singh
  * @Date:   2025-01-29 18:39:11
  * @Last Modified by:   Your name
- * @Last Modified time: 2025-02-12 10:00:22
+ * @Last Modified time: 2025-02-12 10:33:48
  */
 #include <iostream>
 #include <glad/glad.h>
@@ -109,6 +109,10 @@ int main(int argc, char **argv)
     cout << "Maximum supported vertex attributes: " << nrAttributes << endl;
 
     ourShader.use();
+    
+    float offset = 0.5f;
+    ourShader.setFloat("xOffset", offset);
+    
     while (!glfwWindowShouldClose(window)) 
     {
         processInput(window);           // key inputs
@@ -128,7 +132,7 @@ int main(int argc, char **argv)
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     ourShader.deleteShader();
-    
+
     glfwTerminate();
     return 0;
 }
