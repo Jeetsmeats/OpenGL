@@ -2,7 +2,7 @@
  * @Author: Gunjeet Singh
  * @Date:   2025-01-29 18:39:11
  * @Last Modified by:   Your name
- * @Last Modified time: 2025-02-12 10:33:48
+ * @Last Modified time: 2025-02-12 11:54:01
  */
 #include <iostream>
 #include <glad/glad.h>
@@ -109,10 +109,6 @@ int main(int argc, char **argv)
     cout << "Maximum supported vertex attributes: " << nrAttributes << endl;
 
     ourShader.use();
-    
-    float offset = 0.5f;
-    ourShader.setFloat("xOffset", offset);
-    
     while (!glfwWindowShouldClose(window)) 
     {
         processInput(window);           // key inputs
