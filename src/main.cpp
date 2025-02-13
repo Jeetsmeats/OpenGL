@@ -2,28 +2,34 @@
  * @Author: Gunjeet Singh
  * @Date:   2025-01-29 18:39:11
  * @Last Modified by:   Your name
- * @Last Modified time: 2025-02-12 15:53:59
+ * @Last Modified time: 2025-02-13 18:36:02
  */
 #include <iostream>
+#include <filesystem>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 
 // include member functions/classes
 #include "callbacks.h"
 #include "key_input.h"
 #include "shader.h"
 
-// include images
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-
-using namespace std;
-
 #define SCREEN_WIDTH 600
 #define SCREEN_HEIGHT 800
 
 int main(int argc, char **argv)
 {
+    filesystem::path rootPath = filesystem::current_path();
+    filesystem::path texturePath = rootPath / "resources" / "textures";
+    filesystem::path image1Path = texturePath / "container.jpg";
+    filesystem::path image2Path = texturePath / "awesomeface.png";
+
+    string imagePath1Str = image1Path.string();
+    string imagePath2Str = image2Path.string();
+    
     // initialise GLFW settings
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -116,38 +122,38 @@ int main(int argc, char **argv)
     // define vertex attributes - texture coordinates
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
-    
-    // define & generate textures
-    unsigned int texture;
-    glGenTextures(1, &texture);
-    
-    // bind texture
-    glBindTexture(GL_TEXTURE_2D, texture);
 
-    // set texture wrapping/filtering options
+    // texture 1
+    unsigned int texture1;
+    // generate texture
+    glGenTextures(1, &texture1); 
+    // bind texture
+    glBindTexture(GL_TEXTURE_2D, texture1);
+    
+    // set texture wrapping
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // set texture filtering
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     
-    // define texture parameters
+    // data
     int width, height, nrChannels;
-    unsigned char* data = stbi_load("container.jpg", &width, &height, &nrChannels, 0);
+    unsigned char *data = stbi_load(imagePath1Str.c_str(),
+                     &width, &height, &nrChannels, 0);
 
     if (data)
     {
-        // generate texture w/ image
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+                                    GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
-        
     } else 
     {
-        cout << "Failed to load the texture" << endl;
+        cout << "Failed to load texture" << endl;
     }
-    
-    // free image memory
     stbi_image_free(data);
     
+    ourShader.use();
     // Wireframe Mode
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);  
     // Default Mode
@@ -165,10 +171,11 @@ int main(int argc, char **argv)
         // rendering commands
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-
+        
         // bind texture
-        glBindTexture(GL_TEXTURE_2D, texture);
-
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture1);
+        
         // render container
         ourShader.use();
         glBindVertexArray(VAO);
