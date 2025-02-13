@@ -2,7 +2,7 @@
  * @Author: Gunjeet Singh
  * @Date:   2025-01-29 18:39:11
  * @Last Modified by:   Your name
- * @Last Modified time: 2025-02-13 18:36:02
+ * @Last Modified time: 2025-02-13 19:28:35
  */
 #include <iostream>
 #include <filesystem>
@@ -20,10 +20,12 @@
 #define SCREEN_WIDTH 600
 #define SCREEN_HEIGHT 800
 
+// resource paths
+const filesystem::path rootPath = filesystem::current_path();
+const filesystem::path texturePath = rootPath / "resources" / "textures";
+
 int main(int argc, char **argv)
 {
-    filesystem::path rootPath = filesystem::current_path();
-    filesystem::path texturePath = rootPath / "resources" / "textures";
     filesystem::path image1Path = texturePath / "container.jpg";
     filesystem::path image2Path = texturePath / "awesomeface.png";
 
@@ -66,8 +68,8 @@ int main(int argc, char **argv)
     glViewport(0, 0, 800, 600);
 
     // create the shader program
-    Shader ourShader("shaders/shader.vs", "shaders/shader.fs");
-    ourShader.use();                        // activate program
+    Shader shader("shaders/shader.vs", "shaders/shader.fs");
+    shader.use();                        // activate program
 
     // vertex coords
     float vertices[] = {
@@ -75,13 +77,6 @@ int main(int argc, char **argv)
         0.5f,-0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // bottom right
         -0.5f,-0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
         -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f // top left
-    };
-
-    // texture coords
-    float textCoords[] = {
-        0.0f, 0.0f,
-        1.0f, 0.0f, 
-        0.5f, 1.0f
     };
     
     // triangle indices
@@ -124,7 +119,7 @@ int main(int argc, char **argv)
     glEnableVertexAttribArray(2);
 
     // texture 1
-    unsigned int texture1;
+    unsigned int texture1, texture2;
     // generate texture
     glGenTextures(1, &texture1); 
     // bind texture
@@ -139,10 +134,13 @@ int main(int argc, char **argv)
     
     // data
     int width, height, nrChannels;
+    
+    // load image
+    stbi_set_flip_vertically_on_load(true);
+    
     unsigned char *data = stbi_load(imagePath1Str.c_str(),
                      &width, &height, &nrChannels, 0);
-
-    if (data)
+    if (data)           // mipmap & texture setup
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
                                     GL_UNSIGNED_BYTE, data);
@@ -151,9 +149,37 @@ int main(int argc, char **argv)
     {
         cout << "Failed to load texture" << endl;
     }
+    
     stbi_image_free(data);
     
-    ourShader.use();
+    // generate texture
+    glGenTextures(1, &texture2); 
+    // bind texture
+    glBindTexture(GL_TEXTURE_2D, texture2);
+    // set the texture wrapping parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // set texture filtering parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
+    // load image
+    data = stbi_load(imagePath2Str.c_str(),
+                    &width, &height, &nrChannels, 0);
+    
+    if (data)           // mipmap & texture setup
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA,
+                                    GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    } else 
+    {
+        cout << "Failed to load texture" << endl;
+    }          
+         
+    shader.use();
+    shader.setInt("texture1", 0); 
+    shader.setInt("texture2", 1); 
     // Wireframe Mode
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);  
     // Default Mode
@@ -172,12 +198,14 @@ int main(int argc, char **argv)
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         
-        // bind texture
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture1);
+        // bind texture 1
+        glActiveTexture(GL_TEXTURE0);               // texture unit 0 
+        glBindTexture(GL_TEXTURE_2D, texture1);      
+        glActiveTexture(GL_TEXTURE1);               // texture unit 1
+        glBindTexture(GL_TEXTURE_2D, texture2);
         
         // render container
-        ourShader.use();
+        shader.use();
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -188,7 +216,7 @@ int main(int argc, char **argv)
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
-    ourShader.deleteShader();
+    shader.deleteShader();
 
     glfwTerminate();
     return 0;
