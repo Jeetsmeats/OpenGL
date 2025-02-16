@@ -1,4 +1,4 @@
-# Particle-Sims
+# OpenGL
 
 ### Getting started
 

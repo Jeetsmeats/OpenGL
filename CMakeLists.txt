@@ -29,5 +29,6 @@ target_link_libraries(OpenGLProject
 		glfw
         glad
 		stb
+		glm
 )
 

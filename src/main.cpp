@@ -2,12 +2,16 @@
  * @Author: Gunjeet Singh
  * @Date:   2025-01-29 18:39:11
  * @Last Modified by:   Your name
- * @Last Modified time: 2025-02-15 00:00:41
+ * @Last Modified time: 2025-02-16 12:27:42
  */
 #include <iostream>
 #include <filesystem>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -85,6 +89,11 @@ int main(int argc, char **argv)
         1, 2, 3
     };
 
+    // transformation
+    glm::mat4 trans = glm::mat4(1.0f);
+
+    unsigned int transformLoc = glGetUniformLocation(shader.ID, "transform");
+    
     // Vertex buffer, array object and element buffer
     unsigned int VBO, VAO, EBO;
 
@@ -192,25 +201,30 @@ int main(int argc, char **argv)
     
     while (!glfwWindowShouldClose(window)) 
     {
-        processInput(window);           // key inputs
-        
+        // trans = glm::translate(trans, glm::vec3(2.0f, 1.0f, 0.0f));
+        float rot = (float) sin(0.00001f * glfwGetTime());
+        trans = glm::rotate(trans, rot, glm::vec3(0.0f, 0.0f, 1.0f));
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+
+        processInput(window); // key inputs
+
         // rendering commands
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        
+
         // bind texture 1
-        glActiveTexture(GL_TEXTURE0);               // texture unit 0 
-        glBindTexture(GL_TEXTURE_2D, texture1);      
-        glActiveTexture(GL_TEXTURE1);               // texture unit 1
+        glActiveTexture(GL_TEXTURE0); // texture unit 0
+        glBindTexture(GL_TEXTURE_2D, texture1);
+        glActiveTexture(GL_TEXTURE1); // texture unit 1
         glBindTexture(GL_TEXTURE_2D, texture2);
-        
+
         // render container
         shader.use();
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-        glfwSwapBuffers(window);        // swap buffers
-        glfwPollEvents();               // poll for events
+        glfwSwapBuffers(window); // swap buffers
+        glfwPollEvents();        // poll for events
     }
 
     glDeleteVertexArrays(1, &VAO);
