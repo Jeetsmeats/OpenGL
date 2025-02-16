@@ -2,7 +2,7 @@
  * @Author: Gunjeet Singh
  * @Date:   2025-01-29 18:39:11
  * @Last Modified by:   Your name
- * @Last Modified time: 2025-02-16 12:27:42
+ * @Last Modified time: 2025-02-16 12:49:26
  */
 #include <iostream>
 #include <filesystem>
@@ -91,6 +91,7 @@ int main(int argc, char **argv)
 
     // transformation
     glm::mat4 trans = glm::mat4(1.0f);
+    trans = glm::scale(trans, glm::vec3(0.1f, 1.0f, 0.0f));
 
     unsigned int transformLoc = glGetUniformLocation(shader.ID, "transform");
     
@@ -143,7 +144,6 @@ int main(int argc, char **argv)
     
     // data
     int width, height, nrChannels;
-    
     // load image
     stbi_set_flip_vertically_on_load(true);
     
@@ -201,8 +201,7 @@ int main(int argc, char **argv)
     
     while (!glfwWindowShouldClose(window)) 
     {
-        // trans = glm::translate(trans, glm::vec3(2.0f, 1.0f, 0.0f));
-        float rot = (float) sin(0.00001f * glfwGetTime());
+        float rot = 0.0001f * cos(glfwGetTime());
         trans = glm::rotate(trans, rot, glm::vec3(0.0f, 0.0f, 1.0f));
         glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 
