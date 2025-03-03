@@ -2,7 +2,7 @@
  * @Author: Gunjeet Singh
  * @Date:   2025-01-29 18:39:11
  * @Last Modified by:   Your name
- * @Last Modified time: 2025-02-16 12:49:26
+ * @Last Modified time: 2025-02-19 18:12:56
  */
 #include <iostream>
 #include <filesystem>
@@ -89,11 +89,26 @@ int main(int argc, char **argv)
         1, 2, 3
     };
 
-    // transformation
-    glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::scale(trans, glm::vec3(0.1f, 1.0f, 0.0f));
+    // transformation   
+    glm::mat4 model = glm::mat4(1.0f);                          // world space
+    model = glm::rotate(model, glm::radians(-55.0f),
+                        glm::vec3(1.0f, 0.0f, 0.0f));
 
-    unsigned int transformLoc = glGetUniformLocation(shader.ID, "transform");
+    glm::mat4 view = glm::mat4(1.0f);                           // view space
+    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+
+    glm::mat4 projection;                                       // projection space
+    projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+
+    // transformation matrix uniform locations
+    unsigned int modelLoc = glGetUniformLocation(shader.ID, "model");
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+    unsigned int viewLoc = glGetUniformLocation(shader.ID, "view");
+    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+    
+    unsigned int projectionLoc = glGetUniformLocation(shader.ID, "projection");
+    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
     
     // Vertex buffer, array object and element buffer
     unsigned int VBO, VAO, EBO;
@@ -201,10 +216,6 @@ int main(int argc, char **argv)
     
     while (!glfwWindowShouldClose(window)) 
     {
-        float rot = 0.0001f * cos(glfwGetTime());
-        trans = glm::rotate(trans, rot, glm::vec3(0.0f, 0.0f, 1.0f));
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
-
         processInput(window); // key inputs
 
         // rendering commands
