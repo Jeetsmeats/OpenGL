@@ -1,9 +1,3 @@
-/**
- * @Author: Your name
- * @Date:   2025-02-11 17:02:27
- * @Last Modified by:   Your name
- * @Last Modified time: 2025-02-12 10:00:03
- */
 #include "shader.h"
 
 using namespace std;

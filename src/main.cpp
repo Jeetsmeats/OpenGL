@@ -1,9 +1,3 @@
-/**
- * @Author: Gunjeet Singh
- * @Date:   2025-01-29 18:39:11
- * @Last Modified by:   Your name
- * @Last Modified time: 2025-02-19 18:12:56
- */
 #include <iostream>
 #include <filesystem>
 #include <glad/glad.h>
