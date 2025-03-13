@@ -252,11 +252,14 @@ int main(int argc, char **argv)
         for (unsigned int i = 0; i < 10; i++) {
             // transformation   
             glm::mat4 model = glm::mat4(1.0f);                          // world space
-
             model = glm::translate(model, cubePositions[i]);
-            float angle = 20.0f * i;
-
-            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            if (i % 3 == 0) {
+                model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(1.0f, 0.5f, 0.25f));
+            } else {
+                float angle = 20.0f * i;
+                model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            }
+        
             // transformation matrix uniform locations
             shader.setMat4("model", model);
 
