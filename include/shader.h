@@ -10,6 +10,7 @@
 #define __SHADER_H__
 
 #include <glad/glad.h>
+#include <glm/glm.hpp>
 
 #include <string>
 #include <fstream>
@@ -49,6 +50,11 @@ public:
     /// @param name uniform name
     /// @param value uniform value
     void setFloat(const string &name, float value) const;
+
+    /// @brief Utility uniform function for setting matrix
+    /// @param name uniform name
+    /// @param mat uniform matrix val
+    void setMat4(const string &name, glm::mat4 mat) const;
 };
 
 #endif /* __SHADER_H__ */

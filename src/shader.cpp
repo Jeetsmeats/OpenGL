@@ -1,9 +1,10 @@
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include "shader.h"
 
 using namespace std;
 
-Shader::Shader(const char* vertexPath, const char* fragmentPath)
-{
+Shader::Shader(const char* vertexPath, const char* fragmentPath) {
     // retrieve source code from file path
     string vertexCode;
     string fragmentCode;
@@ -92,26 +93,25 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
     glDeleteShader(fragment);
 }
 
-void Shader::use() 
-{
+void Shader::use()  {
     glUseProgram(ID);
 }
 
-void Shader::deleteShader()
-{
+void Shader::deleteShader() {
     glDeleteShader(ID);
 }
-void Shader::setBool(const string &name, bool value) const
-{
+void Shader::setBool(const string &name, bool value) const {
     glUniform1i(glGetUniformLocation(ID, name.c_str()), (int) value);
 }
 
-void Shader::setInt(const string &name, int value) const
-{
+void Shader::setInt(const string &name, int value) const {
     glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
 }
 
-void Shader::setFloat(const string &name, float value) const
-{
+void Shader::setFloat(const string &name, float value) const {
     glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
+}
+
+void Shader::setMat4(const string &name, glm::mat4 mat) const {
+    glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(mat));
 }
