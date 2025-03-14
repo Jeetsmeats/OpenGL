@@ -234,18 +234,9 @@ int main(int argc, char **argv)
     // Default Mode
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glEnable(GL_DEPTH_TEST);
-    
-    // camera setup
-    // glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-    // glm::vec3 cameraTarget  = glm::vec3(0.0f, 0.0f, 0.0f);
-    // glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
-
-    // glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-    // glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
-    // glm::vec3 cameraUp = glm::normalize(glm::cross(cameraDirection, cameraRight));
 
     // view and projection matrices
-    glm::mat4 view = glm::mat4(1.0f);
+    glm::mat4 view;
     glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float) SCREEN_WIDTH / (float) SCREEN_HEIGHT, 0.1f, 100.0f);
 
     // check number of attributes
