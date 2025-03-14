@@ -19,8 +19,7 @@
 
 using namespace std;
 
-class Shader 
-{
+class Shader {
 public:
     // program id
     unsigned int ID;

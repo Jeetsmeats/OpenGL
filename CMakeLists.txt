@@ -10,6 +10,7 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(SOURCES
 	"src/main.cpp"
 	"src/shader.cpp"
+	"src/camera.cpp"
 )
 add_subdirectory(
 	"vendor/"

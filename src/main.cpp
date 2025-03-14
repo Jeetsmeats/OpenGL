@@ -12,27 +12,22 @@
 
 // include member functions/classes
 #include "shader.h"
+#include "camera.h"
 
-#define SCREEN_WIDTH 600
-#define SCREEN_HEIGHT 800
+#define SCREEN_WIDTH 900
+#define SCREEN_HEIGHT 1200
 
 // resource paths
 const filesystem::path rootPath = filesystem::current_path();
 const filesystem::path texturePath = rootPath / "resources" / "textures";
 
-// camera global variables
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+// global camera
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
-float deltaTime = 0.0f;
+float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
-float lastX = SCREEN_WIDTH / 2;
-float lastY = SCREEN_HEIGHT / 2;
-
-float yaw = -90.0f;
-float pitch = 0.0f;
-float fov = 45.0f;
+float lastX = (float) SCREEN_WIDTH / 2;
+float lastY = (float) SCREEN_HEIGHT / 2;
 
 // declarations
 void processInput(GLFWwindow* window);
@@ -250,10 +245,8 @@ int main(int argc, char **argv)
     // glm::vec3 cameraUp = glm::normalize(glm::cross(cameraDirection, cameraRight));
 
     // view and projection matrices
-    glm::mat4 view;
-    glm::mat4 lookAt;
-
-    glm::mat4 projection = glm::perspective(glm::radians(fov), (float)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 100.0f);
+    glm::mat4 view = glm::mat4(1.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float) SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 100.0f);
 
     // check number of attributes
     // int nrAttributes;
@@ -273,9 +266,9 @@ int main(int argc, char **argv)
         glBindTexture(GL_TEXTURE_2D, texture1);
         glActiveTexture(GL_TEXTURE1); // texture unit 1
         glBindTexture(GL_TEXTURE_2D, texture2);
-        
-        view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-        projection = glm::perspective(glm::radians(fov),
+
+        view = camera.calculateLookAt();
+        projection = glm::perspective(glm::radians(camera.getZoom()),
                  (float) SCREEN_HEIGHT / (float) SCREEN_WIDTH, 0.1f, 100.0f);
 
         shader.setMat4("view", view);
@@ -326,18 +319,17 @@ void processInput(GLFWwindow* window)
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
-    const float cameraSpeed = 2.5f * deltaTime;
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        cameraPos += cameraSpeed * cameraFront;
+        camera.moveCamera(FORWARD, deltaTime);
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        cameraPos -= cameraSpeed * cameraFront;
+        camera.moveCamera(BACKWARD, deltaTime);
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        cameraPos -= cameraSpeed * glm::normalize(glm::cross(cameraFront, cameraUp));
+        camera.moveCamera(LEFT, deltaTime);
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        cameraPos += cameraSpeed * glm::normalize(glm::cross(cameraFront, cameraUp));
+        camera.moveCamera(RIGHT, deltaTime);
     }
 }
 
@@ -356,37 +348,9 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 /// @param yPos mouse y position
 void mouse_callback(GLFWwindow *window, double xPos, double yPos) {
 
-    // calculate offset
-    float xOffset = xPos - lastX;
-    float yOffset = yPos - lastY;
-
-    // reset last x and y
+    camera.orientCamera(lastX, lastY, xPos, yPos);
     lastX = xPos;
     lastY = yPos;
-
-    // apply camera sensitivity
-    const float sensitivity = 0.1f;
-    xOffset *= sensitivity;
-    yOffset *= sensitivity;
-
-    // update camera orientation
-    yaw += xOffset;
-    pitch += yOffset;
-
-    // constraints
-    if (pitch > 89.0f) {
-        pitch = 89.0f;
-    }
-    if (pitch < -89.0f) {
-        pitch = -89.0f;
-    }
-
-    glm::vec3 direction;
-    direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    direction.y = sin(glm::radians(pitch));
-    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-
-    cameraFront = glm::normalize(direction);
 }
 
 /// @brief mouse scroll callback
@@ -395,11 +359,5 @@ void mouse_callback(GLFWwindow *window, double xPos, double yPos) {
 /// @param yOffset y scroll - main scroll
 void scroll_callback(GLFWwindow *window, double xOffset, double yOffset) {
 
-    fov -= (float) yOffset;
-    if (fov < 1.0f) {
-        fov = 1.0f;
-    }
-    if (fov > 45.0f) {
-        fov = 45.0f;
-    }
+    camera.cameraZoom((float) yOffset);
 }
