@@ -12,7 +12,7 @@
 
 // include member functions/classes
 #include "callbacks.h"
-#include "key_input.h"
+// #include "key_input.h"
 #include "shader.h"
 
 #define SCREEN_WIDTH 600
@@ -21,6 +21,13 @@
 // resource paths
 const filesystem::path rootPath = filesystem::current_path();
 const filesystem::path texturePath = rootPath / "resources" / "textures";
+
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+// declaration
+void processInput(GLFWwindow* window);
 
 int main(int argc, char **argv)
 {
@@ -230,12 +237,8 @@ int main(int argc, char **argv)
     glm::mat4 view;
     glm::mat4 lookAt;
 
-    // camera rotation
-    float radius = 30.0f;
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 100.0f);
 
-    glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float) SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 100.0f);
-    
-    
     // check number of attributes
     // int nrAttributes;
     // glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
@@ -255,13 +258,7 @@ int main(int argc, char **argv)
         glActiveTexture(GL_TEXTURE1); // texture unit 1
         glBindTexture(GL_TEXTURE_2D, texture2);
         
-        float camX = sin(glfwGetTime()) * radius;
-        float camZ = cos(glfwGetTime()) * radius;
-        view = glm::lookAt(
-            glm::vec3(camX, 0.0f, camZ),
-            glm::vec3(0.0f, 0.0f, 0.0f),
-            glm::vec3(0.0f, 1.0f, 0.0f)
-        );
+        view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
         projection = glm::perspective(glm::radians(45.0f),
                  (float) SCREEN_HEIGHT / (float) SCREEN_WIDTH, 0.1f, 100.0f);
 
@@ -298,4 +295,29 @@ int main(int argc, char **argv)
 
     glfwTerminate();
     return 0;
+}
+
+/// @brief process keyboard events
+/// @param window game window
+void processInput(GLFWwindow* window) 
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {                // escape to close
+
+        glfwSetWindowShouldClose(window, true);             // close window
+    }
+
+    const float cameraSpeed = 0.05f;
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        cameraPos += cameraSpeed * cameraFront;
+    }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        cameraPos -= cameraSpeed * cameraFront;
+    }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        cameraPos -= cameraSpeed * glm::normalize(glm::cross(cameraFront, cameraUp));
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        cameraPos += cameraSpeed * glm::normalize(glm::cross(cameraFront, cameraUp));
+    }
 }
