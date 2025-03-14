@@ -14,8 +14,8 @@
 #include "shader.h"
 #include "camera.h"
 
-#define SCREEN_WIDTH 900
-#define SCREEN_HEIGHT 1200
+#define SCREEN_WIDTH 600
+#define SCREEN_HEIGHT 800
 
 // resource paths
 const filesystem::path rootPath = filesystem::current_path();
@@ -246,7 +246,7 @@ int main(int argc, char **argv)
 
     // view and projection matrices
     glm::mat4 view = glm::mat4(1.0f);
-    glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float) SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float) SCREEN_WIDTH / (float) SCREEN_HEIGHT, 0.1f, 100.0f);
 
     // check number of attributes
     // int nrAttributes;
