@@ -101,7 +101,7 @@ void Camera::orientCamera(double lastX, double lastY, double xPos, double yPos) 
 void Camera::updateCameraVectors() {
     
     glm::vec3 front = glm::vec3(
-        front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch)),
+        cos(glm::radians(yaw)) * cos(glm::radians(pitch)),
         sin(glm::radians(pitch)),
         sin(glm::radians(yaw)) * cos(glm::radians(pitch))
     );
