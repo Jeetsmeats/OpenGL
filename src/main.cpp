@@ -216,10 +216,26 @@ int main(int argc, char **argv)
     // Default Mode
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glEnable(GL_DEPTH_TEST);
+    
+    // camera setup
+    // glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+    // glm::vec3 cameraTarget  = glm::vec3(0.0f, 0.0f, 0.0f);
+    // glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
 
-    glm::mat4 view = glm::translate(view, glm::vec3(0.0f, 0.0f, -10.0f));
+    // glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+    // glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
+    // glm::vec3 cameraUp = glm::normalize(glm::cross(cameraDirection, cameraRight));
+
+    // view and projection matrices
+    glm::mat4 view;
+    glm::mat4 lookAt;
+
+    // camera rotation
+    float radius = 30.0f;
+
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float) SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 100.0f);
-
+    
+    
     // check number of attributes
     // int nrAttributes;
     // glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
@@ -228,7 +244,7 @@ int main(int argc, char **argv)
     while (!glfwWindowShouldClose(window)) 
     {
         processInput(window); // key inputs
-        
+
         // rendering commands
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -239,10 +255,13 @@ int main(int argc, char **argv)
         glActiveTexture(GL_TEXTURE1); // texture unit 1
         glBindTexture(GL_TEXTURE_2D, texture2);
         
-        view = glm::mat4(1.0f);                           // view space
-        projection = glm::mat4(1.0f);                     // projection space
-
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
+        float camX = sin(glfwGetTime()) * radius;
+        float camZ = cos(glfwGetTime()) * radius;
+        view = glm::lookAt(
+            glm::vec3(camX, 0.0f, camZ),
+            glm::vec3(0.0f, 0.0f, 0.0f),
+            glm::vec3(0.0f, 1.0f, 0.0f)
+        );
         projection = glm::perspective(glm::radians(45.0f),
                  (float) SCREEN_HEIGHT / (float) SCREEN_WIDTH, 0.1f, 100.0f);
 
