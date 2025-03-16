@@ -54,6 +54,11 @@ public:
     /// @param name uniform name
     /// @param mat uniform matrix val
     void setMat4(const string &name, glm::mat4 mat) const;
+
+    /// @brief Utility uniform function for setting 3 row vector
+    /// @param name uniform name
+    /// @param vector vector value
+    void setVec3(const string &name, glm::vec3 vector) const;
 };
 
 #endif /* __SHADER_H__ */

@@ -17,7 +17,7 @@ enum CAMERA_MOVEMENT
 // camera constants
 const float YAW = -90.0f;
 const float PITCH = 0.0f;
-const float ACCEL = 5.0f;
+const float SPEED_CONSTANT = 5.0f;
 const float SENSITIVITY = 0.1f;
 const float ZOOM = 45.0f;
 const glm::vec3 WORLD_UP = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -33,21 +33,20 @@ private:
 
     // world attributes
     glm::vec3 worldUp;
-
     glm::mat4 lookAt;
 
     float yaw;
     float pitch;
     
-    float accel;
+    float speedConstant;
     float sensitivity;
     float zoom;
 
 public:
     Camera(glm::vec3 cPos, glm::vec3 wUp = WORLD_UP,
-           float yaw = YAW, float pitch = PITCH, float accel = ACCEL, float sensitivity = SENSITIVITY, float zoom = ZOOM) : 
+           float yaw = YAW, float pitch = PITCH, float speedConstant = SPEED_CONSTANT, float sensitivity = SENSITIVITY, float zoom = ZOOM) : 
            cameraPos(cPos), worldUp(wUp), cameraFront(glm::vec3(0.0f, 0.0f, -1.0f)),
-           yaw(yaw), pitch(pitch), accel(accel), sensitivity(sensitivity), zoom(zoom) {};
+           yaw(yaw), pitch(pitch), speedConstant(speedConstant), sensitivity(sensitivity), zoom(zoom) {};
     
     /// @brief calculate the lookAt matrix
     /// @param cTarget camera target

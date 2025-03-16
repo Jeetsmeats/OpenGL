@@ -53,7 +53,7 @@ void Camera::cameraZoom(float zoomOffset) {
 
 void Camera::moveCamera(CAMERA_MOVEMENT cmd, float deltaTime) {
 
-    const float cameraSpeed = accel * deltaTime;
+    const float cameraSpeed = speedConstant * deltaTime;
 
     switch (cmd) {
         case FORWARD:

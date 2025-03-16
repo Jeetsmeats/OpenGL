@@ -22,12 +22,24 @@ const filesystem::path rootPath = filesystem::current_path();
 const filesystem::path texturePath = rootPath / "resources" / "textures";
 
 // global camera
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 0.0f, 10.0f));
+
+// colors
+const glm::vec3 coral(1.0f, 0.5f, 0.31f);                 
+const glm::vec3 white(1.0f, 1.0f, 1.0f);
+const glm::vec3 green(0.0f, 1.0f, 0.0f);
+
+glm::vec3 lightSource = green;
+glm::vec3 toyColor = coral;
+glm::vec3 result = lightSource * toyColor;
 
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 float lastX = (float) SCREEN_WIDTH / 2;
 float lastY = (float) SCREEN_HEIGHT / 2;
+
+// light source
+glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 // declarations
 void processInput(GLFWwindow* window);
@@ -83,51 +95,51 @@ int main(int argc, char **argv)
 
     // create the shader program
     Shader shader("shaders/shader.vs", "shaders/shader.fs");
-    shader.use();                        // activate program
+    Shader lightSourceShader("shaders/lightShader.vs", "shaders/lightShader.fs");
 
     // cube vertices
     float vertices[] = {
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,
+         0.5f, -0.5f, -0.5f,
+         0.5f,  0.5f, -0.5f, 
+         0.5f,  0.5f, -0.5f, 
+        -0.5f,  0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
 
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,
+         0.5f, -0.5f,  0.5f,
+         0.5f,  0.5f,  0.5f,
+         0.5f,  0.5f,  0.5f,
+        -0.5f,  0.5f,  0.5f,
+        -0.5f, -0.5f,  0.5f,
 
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,
+        -0.5f,  0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
+        -0.5f, -0.5f,  0.5f,
+        -0.5f,  0.5f,  0.5f,
 
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,
+         0.5f,  0.5f, -0.5f,
+         0.5f, -0.5f, -0.5f,
+         0.5f, -0.5f, -0.5f,
+         0.5f, -0.5f,  0.5f,
+         0.5f,  0.5f,  0.5f,
 
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,
+         0.5f, -0.5f, -0.5f,
+         0.5f, -0.5f,  0.5f,
+         0.5f, -0.5f,  0.5f,
+        -0.5f, -0.5f,  0.5f,
+        -0.5f, -0.5f, -0.5f,
 
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+        -0.5f,  0.5f, -0.5f,
+         0.5f,  0.5f, -0.5f,
+         0.5f,  0.5f,  0.5f,
+         0.5f,  0.5f,  0.5f,
+        -0.5f,  0.5f,  0.5f,
+        -0.5f,  0.5f, -0.5f,
     };
     
     // cubes
@@ -143,91 +155,41 @@ int main(int argc, char **argv)
         glm::vec3( 1.5f,  0.2f, -1.5f),
         glm::vec3(-1.3f,  1.0f, -1.5f)
     };
-    
-    // Vertex buffer, array object and element buffer
-    unsigned int VBO, VAO;
 
-    // generate vertex array object
-    glGenVertexArrays(1, &VAO);
-    // generate vertex buffer
+
+    // Vertex buffer, array object and element buffer
+    unsigned int VBO, objectVAO;
+
+    glGenVertexArrays(1, &objectVAO);
     glGenBuffers(1, &VBO);
 
-    // bind vertex array
-    glBindVertexArray(VAO);
+    glBindVertexArray(objectVAO);
     
-    // copy vertices into buffers
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    // copy data into buffer
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     // define vertex attribute - position
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*) 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
     glEnableVertexAttribArray(0);
-    // define vertex attributes - texture coordinates
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
 
-    // texture 1
-    unsigned int texture1, texture2;
-    // generate texture
-    glGenTextures(1, &texture1); 
-    // bind texture
-    glBindTexture(GL_TEXTURE_2D, texture1);
-    
-    // set texture wrapping
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // set texture filtering
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    
-    // data
-    int width, height, nrChannels;
-    // load image
-    stbi_set_flip_vertically_on_load(true);
-    
-    unsigned char *data = stbi_load(imagePath1Str.c_str(),
-                     &width, &height, &nrChannels, 0);
-    if (data)           // mipmap & texture setup
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
-                                    GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    } else 
-    {
-        cout << "Failed to load texture" << endl;
-    }
-    
-    stbi_image_free(data);
-    
-    // generate texture
-    glGenTextures(1, &texture2); 
-    // bind texture
-    glBindTexture(GL_TEXTURE_2D, texture2);
-    // set the texture wrapping parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // set texture filtering parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    
-    // load image
-    data = stbi_load(imagePath2Str.c_str(),
-                    &width, &height, &nrChannels, 0);
-    
-    if (data)           // mipmap & texture setup
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA,
-                                    GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    } else 
-    {
-        cout << "Failed to load texture" << endl;
-    }          
-         
     shader.use();
-    shader.setInt("texture1", 0); 
-    shader.setInt("texture2", 1); 
+    shader.setVec3("objectColor", coral);
+    shader.setVec3("lightColor", white);
+
+    // light objectVAO
+    lightSourceShader.use();
+
+    unsigned int lightObjectVAO;
+    glGenVertexArrays(1, &lightObjectVAO);
+
+    // bind vertex array
+    glBindVertexArray(lightObjectVAO);
+
+    // bind vertex object buffer
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+    glEnableVertexAttribArray(0);
 
     // Wireframe Mode
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);  
@@ -252,11 +214,13 @@ int main(int argc, char **argv)
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // bind texture 1
-        glActiveTexture(GL_TEXTURE0); // texture unit 0
-        glBindTexture(GL_TEXTURE_2D, texture1);
-        glActiveTexture(GL_TEXTURE1); // texture unit 1
-        glBindTexture(GL_TEXTURE_2D, texture2);
+        // // bind texture 1
+        // glActiveTexture(GL_TEXTURE0); // texture unit 0
+        // glBindTexture(GL_TEXTURE_2D, texture1);
+        // glActiveTexture(GL_TEXTURE1); // texture unit 1
+        // glBindTexture(GL_TEXTURE_2D, texture2);
+
+        shader.use();
 
         view = camera.calculateLookAt();
         projection = glm::perspective(glm::radians(camera.getZoom()),
@@ -265,31 +229,36 @@ int main(int argc, char **argv)
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
 
-        for (unsigned int i = 0; i < 10; i++) {
-            // transformation   
-            glm::mat4 model = glm::mat4(1.0f);                          // world space
-            model = glm::translate(model, cubePositions[i]);
-            if (i % 3 == 0) {
-                model = glm::rotate(model, (float) glfwGetTime(), glm::vec3(1.0f, 0.5f, 0.25f));
-            } else {
-                float angle = 20.0f * i;
-                model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-            }
-        
-            // transformation matrix uniform locations
-            shader.setMat4("model", model);
+        // transformation   
+        glm::mat4 model = glm::mat4(1.0f);                          // world space
+        model = glm::translate(model, cubePositions[0]);
+        // transformation matrix uniform locations
+        shader.setMat4("model", model);
 
-            glBindVertexArray(VAO);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
-        // render container
-        shader.use();
-    
+        glBindVertexArray(objectVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        // light source
+        lightSourceShader.use();
+
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, lightPos);
+        model = glm::scale(model, glm::vec3(0.2f));
+        
+        // transformation matrix uniform locations
+        lightSourceShader.setMat4("view", view);
+        lightSourceShader.setMat4("projection", projection);
+        lightSourceShader.setMat4("model", model);
+
+        glBindVertexArray(lightObjectVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
         glfwSwapBuffers(window); // swap buffers
         glfwPollEvents();        // poll for events
     }
 
-    glDeleteVertexArrays(1, &VAO);
+    glDeleteVertexArrays(1, &objectVAO);
+    glDeleteVertexArrays(1, &lightObjectVAO);
     glDeleteBuffers(1, &VBO);
     shader.deleteShader();
 
