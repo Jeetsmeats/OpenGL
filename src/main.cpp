@@ -197,7 +197,7 @@ int main(int argc, char **argv)
     while (!glfwWindowShouldClose(window)) 
     {
         processInput(window); // key inputs
-
+        
         // rendering commands
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -209,6 +209,9 @@ int main(int argc, char **argv)
         // glBindTexture(GL_TEXTURE_2D, texture2);
 
         shader.use();
+
+        lightPos.x = 5.0 * sin((float)glfwGetTime());
+        lightPos.z = 5.0 * cos((float)glfwGetTime()) - 2.0;
 
         shader.setVec3("lightPos", lightPos);
         shader.setVec3("viewPos", camera.getCameraPosition());
