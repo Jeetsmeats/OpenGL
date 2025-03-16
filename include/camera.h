@@ -35,9 +35,11 @@ private:
     glm::vec3 worldUp;
     glm::mat4 lookAt;
 
+    // angle with respect to world coordinate system
     float yaw;
     float pitch;
     
+    // camera constants
     float speedConstant;
     float sensitivity;
     float zoom;
@@ -48,6 +50,14 @@ public:
            cameraPos(cPos), worldUp(wUp), cameraFront(glm::vec3(0.0f, 0.0f, -1.0f)),
            yaw(yaw), pitch(pitch), speedConstant(speedConstant), sensitivity(sensitivity), zoom(zoom) {};
     
+    /// @brief get the field of view
+    /// @return field of view value
+    float getZoom() const;
+
+    /// @brief get the camera position
+    /// @return global camera position
+    glm::vec3 getCameraPosition() const;
+
     /// @brief calculate the lookAt matrix
     /// @param cTarget camera target
     /// @return lookAt matrix
@@ -56,10 +66,6 @@ public:
     /// @brief zoom camera functions
     /// @param scroll offset value
     void cameraZoom(float zoomOffset);
-
-    /// @brief get the field of view
-    /// @return field of view value
-    float getZoom();
 
     /// @brief orient the camera based on mouse position
     /// @param lastX previous mouse x position
@@ -72,6 +78,7 @@ public:
     /// @param cmd movement command
     /// @param deltaTime time difference from previous frame to current
     void moveCamera(CAMERA_MOVEMENT cmd, float deltaTime);
+
 
     /// @brief update the camera coordinate system
     void updateCameraVectors();

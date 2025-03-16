@@ -37,8 +37,12 @@ glm::mat4 Camera::calculateLookAt() {
     return rot * trans;
 }
 
-float Camera::getZoom() {
+float Camera::getZoom() const {
     return zoom;
+}
+
+glm::vec3 Camera::getCameraPosition() const {
+    return cameraPos;
 }
 
 void Camera::cameraZoom(float zoomOffset) {
@@ -74,7 +78,6 @@ void Camera::moveCamera(CAMERA_MOVEMENT cmd, float deltaTime) {
 }
 
 void Camera::orientCamera(double lastX, double lastY, double xPos, double yPos) {
-    
     // calculate offset
     float xOffset = xPos - lastX;
     float yOffset = lastY - yPos;               // not-inverted

@@ -22,7 +22,7 @@ const filesystem::path rootPath = filesystem::current_path();
 const filesystem::path texturePath = rootPath / "resources" / "textures";
 
 // global camera
-Camera camera(glm::vec3(0.0f, 0.0f, 10.0f));
+Camera camera(glm::vec3(0.0f, 0.0f, 5.0f));
 
 // colors
 const glm::vec3 coral(1.0f, 0.5f, 0.31f);                 
@@ -33,13 +33,14 @@ glm::vec3 lightSource = green;
 glm::vec3 toyColor = coral;
 glm::vec3 result = lightSource * toyColor;
 
+bool firstMouse = true;
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 float lastX = (float) SCREEN_WIDTH / 2;
 float lastY = (float) SCREEN_HEIGHT / 2;
 
 // light source
-glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+glm::vec3 lightPos(1.2f, 1.0f, 3.0f);
 
 // declarations
 void processInput(GLFWwindow* window);
@@ -141,21 +142,6 @@ int main(int argc, char **argv)
         -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
         -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
     };
-    
-    // cubes
-    glm::vec3 cubePositions[] = {
-        glm::vec3( 0.0f,  0.0f,  0.0f),
-        glm::vec3( 2.0f,  5.0f, -15.0f),
-        glm::vec3(-1.5f, -2.2f, -2.5f),
-        glm::vec3(-3.8f, -2.0f, -12.3f),
-        glm::vec3( 2.4f, -0.4f, -3.5f),
-        glm::vec3(-1.7f,  3.0f, -7.5f),
-        glm::vec3( 1.3f, -2.0f, -2.5f),
-        glm::vec3( 1.5f,  2.0f, -2.5f),
-        glm::vec3( 1.5f,  0.2f, -1.5f),
-        glm::vec3(-1.3f,  1.0f, -1.5f)
-    };
-
 
     // Vertex buffer, array object and element buffer
     unsigned int VBO, objectVAO;
@@ -177,7 +163,7 @@ int main(int argc, char **argv)
     shader.use();
     shader.setVec3("objectColor", coral);
     shader.setVec3("lightColor", white);
-    
+
     // light objectVAO
     lightSourceShader.use();
 
@@ -224,17 +210,18 @@ int main(int argc, char **argv)
 
         shader.use();
 
+        shader.setVec3("lightPos", lightPos);
+        shader.setVec3("viewPos", camera.getCameraPosition());
+        
         view = camera.calculateLookAt();
         projection = glm::perspective(glm::radians(camera.getZoom()),
                  (float) SCREEN_HEIGHT / (float) SCREEN_WIDTH, 0.1f, 100.0f);
 
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
-        shader.setVec3("lightPos", lightPos);
 
         // transformation   
         glm::mat4 model = glm::mat4(1.0f);                          // world space
-        model = glm::translate(model, cubePositions[0]);
         // transformation matrix uniform locations
         shader.setMat4("model", model);
 
