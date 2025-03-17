@@ -160,9 +160,21 @@ int main(int argc, char **argv)
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) (3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
+    // set object shader constants
     shader.use();
     shader.setVec3("objectColor", coral);
     shader.setVec3("lightColor", white);
+
+    // material settings
+    shader.setVec3("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
+    shader.setVec3("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f));
+    shader.setVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+    shader.setFloat("material.shininess", 32.0f);
+
+    // light settings
+    shader.setVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+    shader.setVec3("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f)); // darkened
+    shader.setVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
     // light objectVAO
     lightSourceShader.use();
@@ -213,7 +225,7 @@ int main(int argc, char **argv)
         lightPos.x = 5.0 * sin((float)glfwGetTime());
         lightPos.z = 5.0 * cos((float)glfwGetTime()) - 2.0;
 
-        shader.setVec3("lightPos", lightPos);
+        shader.setVec3("light.position", lightPos);
         shader.setVec3("viewPos", camera.getCameraPosition());
         
         view = camera.calculateLookAt();
