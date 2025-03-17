@@ -34,6 +34,7 @@ void main()
     // calculate the fragment normal and directional vector to the light source
     vec3 norm = normalize(Normal);
     vec3 lightDir = normalize(light.position - FragPos);
+    
     // light diffusion
     float diff = max(dot(norm, lightDir), 0.0);             // diffusion strength
     vec3 diffuse = light.diffuse * (diff * material.diffuse);                       // diffusion color

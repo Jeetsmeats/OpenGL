@@ -170,10 +170,7 @@ int main(int argc, char **argv)
     shader.setVec3("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f));
     shader.setVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
     shader.setFloat("material.shininess", 32.0f);
-
-    // light settings
-    shader.setVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-    shader.setVec3("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f)); // darkened
+   
     shader.setVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
     // light objectVAO
@@ -221,13 +218,26 @@ int main(int argc, char **argv)
         // glBindTexture(GL_TEXTURE_2D, texture2);
 
         shader.use();
-
+        
+        // orbiting light source
         lightPos.x = 5.0 * sin((float)glfwGetTime());
         lightPos.z = 5.0 * cos((float)glfwGetTime()) - 2.0;
 
+        glm::vec3 lightColor = glm::vec3(
+            sin(glfwGetTime() * 2.0f),
+            sin(glfwGetTime() * 0.7f),
+            sin(glfwGetTime() * 1.3f)
+        );
+        
+        glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
+        glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2);
+
+        // light and camera position uniforms
         shader.setVec3("light.position", lightPos);
         shader.setVec3("viewPos", camera.getCameraPosition());
-        
+        shader.setVec3("light.ambient", ambientColor);
+        shader.setVec3("light.diffuse", diffuseColor);
+
         view = camera.calculateLookAt();
         projection = glm::perspective(glm::radians(camera.getZoom()),
                  (float) SCREEN_HEIGHT / (float) SCREEN_WIDTH, 0.1f, 100.0f);
@@ -255,6 +265,7 @@ int main(int argc, char **argv)
         lightSourceShader.setMat4("projection", projection);
         lightSourceShader.setMat4("model", model);
 
+        lightSourceShader.setVec3("lightColor", lightColor);
         glBindVertexArray(lightObjectVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
