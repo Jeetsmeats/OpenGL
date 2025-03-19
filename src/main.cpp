@@ -184,6 +184,10 @@ int main(int argc, char **argv)
     shader.setInt("material.diffuse", 0);
     shader.setInt("material.specular", 1);
 
+    shader.setFloat("light.constant", 1.0f);
+    shader.setFloat("light.linear", 0.09f);
+    shader.setFloat("light.quadratic", 0.032f);
+
     // light objectVAO
     lightSourceShader.use();
 
@@ -224,7 +228,7 @@ int main(int argc, char **argv)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         shader.use();
-
+            
         // orbiting light source
         lightPos.x = 5.0 * sin((float)glfwGetTime());
         lightPos.z = 5.0 * cos((float)glfwGetTime()) - 2.0;
@@ -247,7 +251,7 @@ int main(int argc, char **argv)
 
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
-        shader.setVec3("light.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
+        // shader.setVec3("light.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
 
         // bind texture
         glActiveTexture(GL_TEXTURE0); // texture unit 0
@@ -278,8 +282,10 @@ int main(int argc, char **argv)
         lightSourceShader.setMat4("model", model);
 
         lightSourceShader.setVec3("lightColor", glm::vec3(1.0f));
-        glBindVertexArray(lightObjectVAO);
 
+        glBindVertexArray(lightObjectVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);  
+        
         glfwSwapBuffers(window); // swap buffers
         glfwPollEvents();        // poll for events
     }
