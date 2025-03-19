@@ -79,7 +79,6 @@ public:
     /// @param deltaTime time difference from previous frame to current
     void moveCamera(CAMERA_MOVEMENT cmd, float deltaTime);
 
-
     /// @brief update the camera coordinate system
     void updateCameraVectors();
 };

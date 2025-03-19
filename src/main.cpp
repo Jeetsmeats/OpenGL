@@ -147,8 +147,7 @@ int main(int argc, char **argv)
     unsigned int specTexture = loadTexture(specImagePathStr.c_str());
 
     // Vertex buffer, array object and element buffer
-    unsigned int VBO,
-        objectVAO;
+    unsigned int VBO, objectVAO;
 
     glGenVertexArrays(1, &objectVAO);
     glGenBuffers(1, &VBO);
@@ -166,9 +165,23 @@ int main(int argc, char **argv)
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*) (6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
+    // positions all containers
+    glm::vec3 cubePositions[] = {
+        glm::vec3( 0.0f,  0.0f,  0.0f),
+        glm::vec3( 2.0f,  5.0f, -15.0f),
+        glm::vec3(-1.5f, -2.2f, -2.5f),
+        glm::vec3(-3.8f, -2.0f, -12.3f),
+        glm::vec3( 2.4f, -0.4f, -3.5f),
+        glm::vec3(-1.7f,  3.0f, -7.5f),
+        glm::vec3( 1.3f, -2.0f, -2.5f),
+        glm::vec3( 1.5f,  2.0f, -2.5f),
+        glm::vec3( 1.5f,  0.2f, -1.5f),
+        glm::vec3(-1.3f,  1.0f, -1.5f)
+    };
+
     // set object shader constants
     shader.use();
-    shader.setInt("material.diffuse", 0.5);
+    shader.setInt("material.diffuse", 0);
     shader.setInt("material.specular", 1);
 
     // light objectVAO
@@ -194,7 +207,8 @@ int main(int argc, char **argv)
 
     // view and projection matrices
     glm::mat4 view;
-    glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float) SCREEN_WIDTH / (float) SCREEN_HEIGHT, 0.1f, 100.0f);
+    glm::mat4 model;
+    glm::mat4 projection;
 
     // check number of attributes
     // int nrAttributes;
@@ -218,13 +232,14 @@ int main(int argc, char **argv)
         shader.use();
         shader.setVec3("light.position", lightPos);
         shader.setVec3("viewPos", camera.getCameraPosition());
+        shader.setFloat("amp", sin(glfwGetTime()));
 
         // light properties
         shader.setVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
         shader.setVec3("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
         shader.setVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
-        shader.setFloat("material.shininess", 64.0f);
+        shader.setFloat("material.shininess", 32.0f);
 
         view = camera.calculateLookAt();
         projection = glm::perspective(glm::radians(camera.getZoom()),
@@ -232,25 +247,28 @@ int main(int argc, char **argv)
 
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
-
-        // transformation   
-        glm::mat4 model = glm::mat4(1.0f);                          // world space
-        // transformation matrix uniform locations
-        shader.setMat4("model", model);
+        shader.setVec3("light.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
 
         // bind texture
         glActiveTexture(GL_TEXTURE0); // texture unit 0
         glBindTexture(GL_TEXTURE_2D, texture);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, specTexture);
-
         glBindVertexArray(objectVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        for (unsigned int i = 0; i < 10; i++) {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, cubePositions[i]);
+            float angle = 20.0f * i;
+            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            shader.setMat4("model", model);
+            glDrawArrays(GL_TRIANGLES, 0, 36);  
+        }
 
         // light source
         lightSourceShader.use();
 
-        model = glm::mat4(1.0f);
+        glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, lightPos);
         model = glm::scale(model, glm::vec3(0.2f));
         
@@ -261,7 +279,6 @@ int main(int argc, char **argv)
 
         lightSourceShader.setVec3("lightColor", glm::vec3(1.0f));
         glBindVertexArray(lightObjectVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
 
         glfwSwapBuffers(window); // swap buffers
         glfwPollEvents();        // poll for events
@@ -318,6 +335,12 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 /// @param yPos mouse y position
 void mouse_callback(GLFWwindow *window, double xPos, double yPos) {
 
+    if (firstMouse) {
+        lastX = xPos;
+        lastY = yPos;
+        firstMouse = false;
+    }
+
     camera.orientCamera(lastX, lastY, xPos, yPos);
     lastX = xPos;
     lastY = yPos;
@@ -336,23 +359,34 @@ unsigned int loadTexture(const char* filePath) {
 
     unsigned int texture;
     glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     int width, height, nrChannels;
     unsigned char *data = stbi_load(filePath, &width, &height, &nrChannels, 0);
 
     if (data) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+        GLenum format;
+        
+        if (nrChannels == 1)
+            format = GL_RED;
+        else if (nrChannels == 3)
+            format = GL_RGB;
+        else if (nrChannels == 4)
+            format = GL_RGBA;
+
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
+        
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
     } else {
         cout << "failed to load texture" << endl;
     }
-
     stbi_image_free(data);
+
     return texture;
 }
