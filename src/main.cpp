@@ -234,10 +234,11 @@ int main(int argc, char **argv)
         lightPos.z = 5.0 * cos((float)glfwGetTime()) - 2.0;
 
         shader.use();
-        shader.setVec3("light.position", lightPos);
+        shader.setVec3("light.position", camera.getCameraPosition());
+        shader.setVec3("light.direction", camera.getCameraFront());
         shader.setVec3("viewPos", camera.getCameraPosition());
-        shader.setFloat("amp", sin(glfwGetTime()));
-
+        shader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
+        
         // light properties
         shader.setVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
         shader.setVec3("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
@@ -285,7 +286,7 @@ int main(int argc, char **argv)
 
         glBindVertexArray(lightObjectVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);  
-        
+
         glfwSwapBuffers(window); // swap buffers
         glfwPollEvents();        // poll for events
     }

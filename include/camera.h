@@ -58,6 +58,10 @@ public:
     /// @return global camera position
     glm::vec3 getCameraPosition() const;
 
+    /// @brief get the camera front
+    /// @return global camera front
+    glm::vec3 getCameraFront() const;
+
     /// @brief calculate the lookAt matrix
     /// @param cTarget camera target
     /// @return lookAt matrix

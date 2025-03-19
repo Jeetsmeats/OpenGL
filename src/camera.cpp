@@ -45,6 +45,10 @@ glm::vec3 Camera::getCameraPosition() const {
     return cameraPos;
 }
 
+glm::vec3 Camera::getCameraFront() const {
+    return cameraFront;
+}
+
 void Camera::cameraZoom(float zoomOffset) {
     zoom -= (float) zoomOffset;
     if (zoom < 1.0f) {
