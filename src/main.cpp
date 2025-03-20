@@ -187,6 +187,8 @@ int main(int argc, char **argv)
     shader.setFloat("light.constant", 1.0f);
     shader.setFloat("light.linear", 0.09f);
     shader.setFloat("light.quadratic", 0.032f);
+    shader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
+    shader.setFloat("light.outerCutOff", glm::cos(glm::radians(15.0f)));
 
     // light objectVAO
     lightSourceShader.use();
@@ -228,16 +230,9 @@ int main(int argc, char **argv)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         shader.use();
-            
-        // orbiting light source
-        lightPos.x = 5.0 * sin((float)glfwGetTime());
-        lightPos.z = 5.0 * cos((float)glfwGetTime()) - 2.0;
-
-        shader.use();
         shader.setVec3("light.position", camera.getCameraPosition());
         shader.setVec3("light.direction", camera.getCameraFront());
         shader.setVec3("viewPos", camera.getCameraPosition());
-        shader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
         
         // light properties
         shader.setVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
