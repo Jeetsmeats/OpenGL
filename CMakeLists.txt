@@ -16,12 +16,13 @@ enable_language(CXX)
 set(SOURCES
 	"src/main.cpp"
 	"src/gl.c"
+	"src/Shader.cpp"
 )
 add_executable(OPENGL ${SOURCES})
 
-target_include_directories(OPENGL PRIVATE 
+target_include_directories(OPENGL PUBLIC
 	"src/"
-	"include"
+	"include/"
 )
 
 target_link_directories(OPENGL PRIVATE
