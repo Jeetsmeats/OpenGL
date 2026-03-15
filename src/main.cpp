@@ -1,6 +1,9 @@
 #include <iostream>
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #define FRAGMENT_SHADER_PATH "shaders/shader.fs"
 #define VERTEX_SHADER_PATH "shaders/shader.vs"
@@ -10,12 +13,13 @@
 #include "stb_image.h"
 
 using namespace std;
+using namespace glm;
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 
-int main() {
-    
+int main() {	
+
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); 
@@ -43,10 +47,10 @@ int main() {
 
     // set of vertices
     float vertices[] = {
-		0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 2.0f, 2.0f, // top right
-		0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 2.0f, 0.0f, // bottom right
+		0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top right
+		0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // bottom right
 		-0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
-		-0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 2.0f // top left
+		-0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f // top left
     };
 	
 	unsigned int indices[] = {
@@ -129,8 +133,21 @@ int main() {
 	shader.setInt("ourTexture", 0);
 	shader.setInt("ourTexture2", 1);
 
+    mat4 trans = glm::mat4(1.0f);
+
+    float prevTime = glfwGetTime();
+    float deltaTime = 0.0f;
+    float angle = 0.0f;
+    float rotationSpeed = radians(180.0f); // 90 degrees per second
     while(!glfwWindowShouldClose(window)) {
 
+        deltaTime = glfwGetTime() - prevTime;
+        prevTime = glfwGetTime();
+
+        angle += rotationSpeed * deltaTime;
+        trans = rotate(mat4(1.0f), angle, vec3(0.0f, 0.0f, 1.0f));
+        shader.setMat4("transform", trans);
+        
         // check if the escape key was pressed or the window was closed
         processInput(window);
 
