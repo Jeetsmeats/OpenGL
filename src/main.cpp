@@ -7,6 +7,8 @@
 
 #define FRAGMENT_SHADER_PATH "shaders/shader.fs"
 #define VERTEX_SHADER_PATH "shaders/shader.vs"
+#define WINDOW_WIDTH 800
+#define WINDOW_HEIGHT 600
 #define STB_IMAGE_IMPLEMENTATION
 
 #include "Shader.h"
@@ -25,7 +27,7 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); 
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "OpenGL Window", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "OpenGL Window", NULL, NULL);
     if (window == NULL) {
         cout << "Failed to create GLFW window" << endl;
         glfwTerminate();
@@ -129,24 +131,27 @@ int main() {
 		return 1;
 	}
 
+    mat4 model = mat4(1.0f);
+    mat4 view = mat4(1.0f);
+    mat4 projection = mat4(1.0f);
+
+    model = rotate(model, radians(-55.0f), vec3(1.0f, 0.0f, 0.0f));
+    view = translate(view, vec3(0.0f, 0.0f, -3.0f));
+    projection = perspective(radians(45.0f), (float) WINDOW_WIDTH / (float) WINDOW_HEIGHT, 0.1f, 100.0f);
+    
 	shader.use();
 	shader.setInt("ourTexture", 0);
 	shader.setInt("ourTexture2", 1);
-
-    mat4 trans = glm::mat4(1.0f);
+    shader.setMat4("model", model);
+    shader.setMat4("view", view);
+    shader.setMat4("projection", projection);
 
     float prevTime = glfwGetTime();
     float deltaTime = 0.0f;
     float angle = 0.0f;
     float rotationSpeed = radians(180.0f); // 90 degrees per second
+
     while(!glfwWindowShouldClose(window)) {
-
-        deltaTime = glfwGetTime() - prevTime;
-        prevTime = glfwGetTime();
-
-        angle += rotationSpeed * deltaTime;
-        trans = rotate(mat4(1.0f), angle, vec3(0.0f, 0.0f, 1.0f));
-        shader.setMat4("transform", trans);
         
         // check if the escape key was pressed or the window was closed
         processInput(window);
