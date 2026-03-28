@@ -182,20 +182,26 @@ int main() {
     return 1;
   }
 
-  glm::mat4 model = glm::mat4(1.0f);
-  glm::mat4 view = glm::mat4(1.0f);
+  // CAMERA SETUP
+  // camera parameters
+  glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+  glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+  glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
+  
+  // canera vectors
+  glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+  glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));  
+  glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
+
   glm::mat4 projection = glm::mat4(1.0f);
+  projection = glm::perspective(glm::radians(60.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
 
-  view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-  projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
-
+  // camera funk
+  const float radius = 10.0f;
   shader.use();
   shader.setInt("ourTexture", 0);
   shader.setInt("ourTexture2", 1);
-  shader.setMat4("model", model);
-  shader.setMat4("view", view);
   shader.setMat4("projection", projection);
-
   float prevTime = glfwGetTime();
   float deltaTime = 0.0f;
   float angle = 0.0f;
@@ -204,9 +210,16 @@ int main() {
   glEnable(GL_DEPTH_TEST); // enable depth testing
 
   while (!glfwWindowShouldClose(window)) {
-
+  
     deltaTime = glfwGetTime() - prevTime;
     prevTime = glfwGetTime();
+
+    float camX = sin(glfwGetTime()) * radius;
+    float camZ = cos(glfwGetTime()) * radius;
+
+    glm::mat4 view;
+    view = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), cameraUp);
+    shader.setMat4("view", view);
 
     // check if the escape key was pressed or the window was closed
     processInput(window);
@@ -215,6 +228,7 @@ int main() {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    // bind textures on corresponding texture units
     shader.use();
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture1);
