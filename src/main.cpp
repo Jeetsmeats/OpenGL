@@ -1,12 +1,12 @@
-#include <iostream>
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <iostream>
 
-#define FRAGMENT_SHADER_PATH "shaders/shader.fs"
-#define VERTEX_SHADER_PATH "shaders/shader.vs"
+#define FRAGMENT_SHADER_PATH PROJECT_ROOT "/shaders/shader.fs"
+#define VERTEX_SHADER_PATH PROJECT_ROOT "/shaders/shader.vs"
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 #define STB_IMAGE_IMPLEMENTATION
@@ -14,186 +14,230 @@
 #include "Shader.h"
 #include "stb_image.h"
 
-using namespace std;
 using namespace glm;
+using namespace std;
 
-void framebufferSizeCallback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow* window);
+const string containerPath = PROJECT_ROOT "/resources/container.jpg";
+const string awesomeFacePath = PROJECT_ROOT "/resources/awesomeface.png";
 
-int main() {	
+void framebufferSizeCallback(GLFWwindow *window, int width, int height);
+void processInput(GLFWwindow *window);
 
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); 
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+int main() {
 
-    GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "OpenGL Window", NULL, NULL);
-    if (window == NULL) {
-        cout << "Failed to create GLFW window" << endl;
-        glfwTerminate();
-        return -1;
-    }
+  cout <<  containerPath << " " << awesomeFacePath << endl;
 
-    // create context for the current calling thread
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+  glfwInit();
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    if (!gladLoadGL((GLADloadfunc) glfwGetProcAddress)) {
-        cout << "Failed to initialize GLAD" << endl;
-        return -1;
-    }
+  GLFWwindow *window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT,
+                                        "OpenGL Window", NULL, NULL);
+  if (window == NULL) {
+    std::cout << "Failed to create GLFW window" << std::endl;
+    glfwTerminate();
+    return -1;
+  }
 
-    int nrAttributes;
-    glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
-    cout << "Maximum number of vertex attributes supported: " << nrAttributes << endl;
+  // create context for the current calling thread
+  glfwMakeContextCurrent(window);
+  glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
-    // set of vertices
-    float vertices[] = {
-		0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top right
-		0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // bottom right
-		-0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
-		-0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f // top left
-    };
-	
-	unsigned int indices[] = {
-		0, 1, 3, // first triangle
-		1, 2, 3 // second triangle
-	};
+  if (!gladLoadGL((GLADloadfunc)glfwGetProcAddress)) {
+    std::cout << "Failed to initialize GLAD" << std::endl;
+    return -1;
+  }
 
-    Shader shader = Shader(VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH);
-    
-    unsigned int VBO, VAO, EBO;
+  int nrAttributes;
+  glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
+  std::cout << "Maximum number of vertex attributes supported: " << nrAttributes << std::endl;
 
-    // generate buffer objects and vertex array object
-    glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
-    glGenVertexArrays(1, &VAO);
+  // set of vertices
+  float vertices[] = {
+  -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+  0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+  0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+  0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+  -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+  -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+  -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+  0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+  0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+  0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+  -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+  -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+  -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+  -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+  -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+  -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+  -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+  -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+  0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+  0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+  0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+  0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+  0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+  0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+  -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+  0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+  0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+  0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+  -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+  -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+  -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+  0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+  0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+  0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+  -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+  -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+  };
+
+  Shader shader = Shader(VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH);
+
+  unsigned int VBO, VAO;
+
+  // generate buffer objects and vertex array object
+  glGenBuffers(1, &VBO);
+  glGenVertexArrays(1, &VAO);
+
+  glBindVertexArray(VAO);
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+  glVertexAttribPointer(
+      0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+      (void *)0); // set the vertex attribute pointer to the buffer object
+  glEnableVertexAttribArray(0);
+
+
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+                        (void *)(3 * sizeof(float)));
+  glEnableVertexAttribArray(1);
+
+  unsigned int texture1, texture2;
+
+  // load textures
+  int width, height, nrChannels;
+  unsigned char *data = stbi_load(containerPath.c_str(), &width, &height, &nrChannels, 0);
+
+  glGenTextures(1, &texture1);
+  glBindTexture(GL_TEXTURE_2D, texture1);
+
+  // texture wrapping
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+                  GL_REPEAT); // set texture wrapping parameters
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                  GL_LINEAR); // set texture filtering parameters
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  if (data) {
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+                 GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    stbi_image_free(data);
+  } else {
+    std::cout << "Failed to load texture1: " << stbi_failure_reason() << std::endl;
+    return 1;
+  }
+
+  glGenTextures(1, &texture2);
+  glBindTexture(GL_TEXTURE_2D, texture2);
+
+  // texture wrapping
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+                  GL_REPEAT); // set texture wrapping parameters
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                  GL_LINEAR); // set texture filtering parameters
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  stbi_set_flip_vertically_on_load(true); // flip the texture on load
+  unsigned char *data2 = stbi_load(awesomeFacePath.c_str(), &width, &height, &nrChannels, 0);
+  if (data2) {
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
+                 GL_UNSIGNED_BYTE, data2);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    stbi_image_free(data2); // free image data after generating texture
+  } else {
+    std::cout << "Failed to load texture2" << std::endl;
+    return 1;
+  }
+
+  mat4 model = mat4(1.0f);
+  mat4 view = mat4(1.0f);
+  mat4 projection = mat4(1.0f);
+
+  view = translate(view, vec3(0.0f, 0.0f, -3.0f));
+  projection = perspective(radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
+
+  shader.use();
+  shader.setInt("ourTexture", 0);
+  shader.setInt("ourTexture2", 1);
+  shader.setMat4("model", model);
+  shader.setMat4("view", view);
+  shader.setMat4("projection", projection);
+
+  float prevTime = glfwGetTime();
+  float deltaTime = 0.0f;
+  float angle = 0.0f;
+  float rotationSpeed = radians(180.0f); // 90 degrees per second
+
+  glEnable(GL_DEPTH_TEST); // enable depth testing
+
+  while (!glfwWindowShouldClose(window)) {
+
+    deltaTime = glfwGetTime() - prevTime;
+    prevTime = glfwGetTime();
+
+    // check if the escape key was pressed or the window was closed
+    processInput(window);
+
+    // rendering commands here
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    shader.use();
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture1);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, texture2);
+
+    model = rotate(model, (float) deltaTime * rotationSpeed, vec3(0.5f, 1.0f, 0.0f));
+    shader.setMat4("model", model);
 
     glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glDrawArrays(GL_TRIANGLES, 0, 36); // update buffers
+    glfwSwapBuffers(window);
+    glfwPollEvents();
+  }
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+  // cleanup
+  glDeleteVertexArrays(1, &VAO);
+  glDeleteBuffers(1, &VBO);
+  glDeleteTextures(1, &texture1);
+  glDeleteTextures(1, &texture2);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*) 0); // set the vertex attribute pointer to the buffer object
-    glEnableVertexAttribArray(0);
+  shader.deleteShader();
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*) (3 * sizeof(float))); // set the vertex attribute pointer to the buffer object
-    glEnableVertexAttribArray(1);
-
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*) (6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
-	
-	unsigned int texture1, texture2;
-
-	// load textures
-	int width, height, nrChannels;
-	unsigned char* data = stbi_load("resources/container.jpg", &width, &height, &nrChannels, 0);
-
-	glGenTextures(1, &texture1);
-	glBindTexture(GL_TEXTURE_2D, texture1);
-	
-	// texture wrapping
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // set texture filtering parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	
-	if (data) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-
-		stbi_image_free(data);
-	} else {
-		cout << "Failed to load texture1" << endl;
-		return 1;
-	}
-
-	glGenTextures(1, &texture2);
-	glBindTexture(GL_TEXTURE_2D, texture2);
-	
-	// texture wrapping
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);							// set texture wrapping parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); 						// set texture filtering parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	
-	stbi_set_flip_vertically_on_load(true); 						// flip the texture on load
-	unsigned char* data2 = stbi_load("resources/awesomeface.png", &width, &height, &nrChannels, 0);
-	if (data2) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2);
-		glGenerateMipmap(GL_TEXTURE_2D);
-
-		stbi_image_free(data2);				// free image data after generating texture
-	} else {
-		cout << "Failed to load texture2" << endl;
-		return 1;
-	}
-
-    mat4 model = mat4(1.0f);
-    mat4 view = mat4(1.0f);
-    mat4 projection = mat4(1.0f);
-
-    model = rotate(model, radians(-55.0f), vec3(1.0f, 0.0f, 0.0f));
-    view = translate(view, vec3(0.0f, 0.0f, -3.0f));
-    projection = perspective(radians(45.0f), (float) WINDOW_WIDTH / (float) WINDOW_HEIGHT, 0.1f, 100.0f);
-    
-	shader.use();
-	shader.setInt("ourTexture", 0);
-	shader.setInt("ourTexture2", 1);
-    shader.setMat4("model", model);
-    shader.setMat4("view", view);
-    shader.setMat4("projection", projection);
-
-    float prevTime = glfwGetTime();
-    float deltaTime = 0.0f;
-    float angle = 0.0f;
-    float rotationSpeed = radians(180.0f); // 90 degrees per second
-
-    while(!glfwWindowShouldClose(window)) {
-        
-        // check if the escape key was pressed or the window was closed
-        processInput(window);
-
-        // rendering commands here
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture1);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, texture2);
-		
-        shader.use();
-        glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-        // update buffers
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
-
-	// cleanup
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
-    glDeleteTextures(1, &texture1);
-	glDeleteTextures(1, &texture2);
-
-    shader.deleteShader();
-
-    glfwTerminate();
-    return 0;
+  glfwTerminate();
+  return 0;
 }
 
-
-void processInput(GLFWwindow* window) {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, true);
-    }
+void processInput(GLFWwindow *window) {
+  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+    glfwSetWindowShouldClose(window, true);
+  }
 }
 
-void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
-    glViewport(0, 0, width, height);
+void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
+  glViewport(0, 0, width, height);
 }

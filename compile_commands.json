@@ -1,0 +1,20 @@
+[
+{
+  "directory": "C:/Users/gunje/Documents/OpenGL/build",
+  "command": "C:\\msys64\\clang64\\bin\\clang++.exe -IC:/Users/gunje/Documents/OpenGL/src -IC:/Users/gunje/Documents/OpenGL/include -g -std=gnu++20 -o CMakeFiles\\OPENGL.dir\\src\\main.cpp.obj -c C:\\Users\\gunje\\Documents\\OpenGL\\src\\main.cpp",
+  "file": "C:/Users/gunje/Documents/OpenGL/src/main.cpp",
+  "output": "C:/Users/gunje/Documents/OpenGL/build/CMakeFiles/OPENGL.dir/src/main.cpp.obj"
+},
+{
+  "directory": "C:/Users/gunje/Documents/OpenGL/build",
+  "command": "C:\\msys64\\clang64\\bin\\clang.exe -IC:/Users/gunje/Documents/OpenGL/src -IC:/Users/gunje/Documents/OpenGL/include -O0 -o CMakeFiles\\OPENGL.dir\\src\\gl.c.obj -c C:\\Users\\gunje\\Documents\\OpenGL\\src\\gl.c",
+  "file": "C:/Users/gunje/Documents/OpenGL/src/gl.c",
+  "output": "C:/Users/gunje/Documents/OpenGL/build/CMakeFiles/OPENGL.dir/src/gl.c.obj"
+},
+{
+  "directory": "C:/Users/gunje/Documents/OpenGL/build",
+  "command": "C:\\msys64\\clang64\\bin\\clang++.exe -IC:/Users/gunje/Documents/OpenGL/src -IC:/Users/gunje/Documents/OpenGL/include -g -std=gnu++20 -o CMakeFiles\\OPENGL.dir\\src\\Shader.cpp.obj -c C:\\Users\\gunje\\Documents\\OpenGL\\src\\Shader.cpp",
+  "file": "C:/Users/gunje/Documents/OpenGL/src/Shader.cpp",
+  "output": "C:/Users/gunje/Documents/OpenGL/build/CMakeFiles/OPENGL.dir/src/Shader.cpp.obj"
+}
+]

@@ -1,8 +1,51 @@
-/build
-/.vscode
-/include
-/glfw
-/glad
-settings.json
+# Compiled objects
+*.o
+*.obj
+*.out
+
+# Executables
+*.exe
 *.dll
+*.so
+*.dylib
+
+# Build directories
+build/
+bin/
+dist/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.cbp
+*.layout
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Dependencies
+*.a
+*.lib
+external/
+
+# CMake
+CMakeFiles/
+cmake_install.cmake
+CMakeCache.txt
+Makefile
+
+# Visual Studio
+.vs/
+*.sln
+*.vcxproj
+*.vcxproj.filters
+
+# Libraries
+include/
+
+# Resource Files
 resources/
