@@ -11,6 +11,7 @@
 #define WINDOW_HEIGHT 600
 #define STB_IMAGE_IMPLEMENTATION
 
+#include "Camera.h"
 #include "Shader.h"
 #include "stb_image.h"
 
@@ -31,24 +32,13 @@ glm::vec3 cubePositions[] = {
 };
 
 // CAMERA SETUP
-// camera parameters
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
+Camera camera(
+    glm::vec3(0.0f, 0.0f, 3.0f),
+    glm::vec3(0.0f, 1.0f, 0.0f),
+    -90.0f, 0.0f,
+    WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f
+);
 
-// camera vectors
-glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));  
-glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
-glm::vec3 cameraForward = glm::vec3(0.0f, 0.0f, -1.0f);
-
-float lastX = WINDOW_WIDTH / 2.0f;
-float lastY = WINDOW_HEIGHT / 2.0f;
-bool firstMouse = true;
-
-float yaw = -90.0f;
-float pitch = 0.0f;
-float zoom = 45.0f;	
 void framebufferSizeCallback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window, float deltaTime);
 void mouseCallback(GLFWwindow *window, double xpos, double ypos);
@@ -230,12 +220,10 @@ int main() {
     float camX = sin(glfwGetTime()) * radius;
     float camZ = cos(glfwGetTime()) * radius;
 
-    glm::mat4 view;
-    view = glm::lookAt(cameraPos, cameraPos + cameraForward, cameraUp);
+    glm::mat4 view = camera.calculateLookAt();
     shader.setMat4("view", view);
 
-	glm::mat4 perspective;
-	perspective = glm::perspective(glm::radians(zoom), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
+	glm::mat4 perspective = glm::perspective(glm::radians(camera.getZoom()), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
 	shader.setMat4("projection", perspective);
 
     // check if the escape key was pressed or the window was closed
@@ -285,16 +273,16 @@ void processInput(GLFWwindow *window, float deltaTime) {
   
   float cameraSpeed = 10.0f * deltaTime;
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-    cameraPos += cameraForward * cameraSpeed;
+    camera.CameraPos += camera.CameraFront * cameraSpeed;
   }
   if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-    cameraPos -= cameraForward * cameraSpeed; 
+    camera.CameraPos -= camera.CameraFront * cameraSpeed; 
   }
   if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-    cameraPos -= glm::normalize(glm::cross(cameraForward, cameraUp)) * cameraSpeed;
+    camera.CameraPos -= glm::normalize(glm::cross(camera.CameraFront, camera.CameraUp)) * cameraSpeed;
   }
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-    cameraPos += glm::normalize(glm::cross(cameraForward, cameraUp)) * cameraSpeed;
+    camera.CameraPos += glm::normalize(glm::cross(camera.CameraFront, camera.CameraUp)) * cameraSpeed;
   }
 }
 
@@ -303,45 +291,9 @@ void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
 }
 
 void mouseCallback(GLFWwindow *window, double xpos, double ypos) {
-  const float sensitivity = 0.1f; // change this value to your liking
-
-  if (firstMouse) {
-    lastX = xpos;
-    lastY = ypos;
-    firstMouse = false;
-  }
-
-  float xoffset = xpos - lastX;
-  float yoffset = lastY - ypos;							// reversed since y-coordinates go from bottom to top
-  lastX = xpos;
-  lastY = ypos;
-
-  xoffset *= sensitivity;
-  yoffset *= sensitivity;
-  
-  yaw += xoffset;
-  pitch += yoffset;
-
-  // constraint pitch
-  if (pitch > 89.0f)
-    pitch = 89.0f;
-  if (pitch < -89.0f)
-    pitch = -89.0f;
-
-  glm::vec3 direction = glm::vec3(
-	cos(glm::radians(yaw)) * cos(glm::radians(pitch)),
-	sin(glm::radians(pitch)),
-	sin(glm::radians(yaw)) * cos(glm::radians(pitch))
-  );
-
-  cameraForward = glm::normalize(direction);
+  camera.mouseCallback(window, xpos, ypos);
 }
 
 void scrollCallback(GLFWwindow *window, double xoffset, double yoffset) {
-  // Implement zoom functionality if needed
-  zoom -= (float) yoffset;
-  if (zoom < 1.0f)
-	zoom = 1.0f;
-  if (zoom > 45.0f)
-	zoom = 45.0f; 
+  camera.scrollCallback(window, xoffset, yoffset);
 }
