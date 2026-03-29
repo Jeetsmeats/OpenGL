@@ -48,10 +48,11 @@ bool firstMouse = true;
 
 float yaw = -90.0f;
 float pitch = 0.0f;
-
+float zoom = 45.0f;	
 void framebufferSizeCallback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window, float deltaTime);
 void mouseCallback(GLFWwindow *window, double xpos, double ypos);
+void scrollCallback(GLFWwindow *window, double xoffset, double yoffset);
 
 int main() {
 
@@ -74,6 +75,7 @@ int main() {
   glfwMakeContextCurrent(window);
   glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
   glfwSetCursorPosCallback(window, mouseCallback);
+  glfwSetScrollCallback(window, scrollCallback);
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // capture the mouse cursor
   
   if (!gladLoadGL((GLADloadfunc)glfwGetProcAddress)) {
@@ -232,6 +234,10 @@ int main() {
     view = glm::lookAt(cameraPos, cameraPos + cameraForward, cameraUp);
     shader.setMat4("view", view);
 
+	glm::mat4 perspective;
+	perspective = glm::perspective(glm::radians(zoom), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
+	shader.setMat4("projection", perspective);
+
     // check if the escape key was pressed or the window was closed
     processInput(window, deltaTime);
 
@@ -279,19 +285,15 @@ void processInput(GLFWwindow *window, float deltaTime) {
   
   float cameraSpeed = 10.0f * deltaTime;
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-    std::cout << "W key pressed" << std::endl;
     cameraPos += cameraForward * cameraSpeed;
   }
   if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-    std::cout << "S key pressed" << std::endl;
     cameraPos -= cameraForward * cameraSpeed; 
   }
   if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-    std::cout << "A key pressed" << std::endl;
     cameraPos -= glm::normalize(glm::cross(cameraForward, cameraUp)) * cameraSpeed;
   }
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-    std::cout << "D key pressed" << std::endl;
     cameraPos += glm::normalize(glm::cross(cameraForward, cameraUp)) * cameraSpeed;
   }
 }
@@ -333,4 +335,13 @@ void mouseCallback(GLFWwindow *window, double xpos, double ypos) {
   );
 
   cameraForward = glm::normalize(direction);
+}
+
+void scrollCallback(GLFWwindow *window, double xoffset, double yoffset) {
+  // Implement zoom functionality if needed
+  zoom -= (float) yoffset;
+  if (zoom < 1.0f)
+	zoom = 1.0f;
+  if (zoom > 45.0f)
+	zoom = 45.0f; 
 }
