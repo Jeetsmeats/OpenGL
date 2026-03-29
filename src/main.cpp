@@ -30,8 +30,20 @@ glm::vec3 cubePositions[] = {
     glm::vec3(-1.3f, 1.0f, -1.5f)
 };
 
+// CAMERA SETUP
+// camera parameters
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
+
+// canera vectors
+glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));  
+glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
+glm::vec3 cameraForward = glm::vec3(0.0f, 0.0f, -1.0f);
+
 void framebufferSizeCallback(GLFWwindow *window, int width, int height);
-void processInput(GLFWwindow *window);
+void processInput(GLFWwindow *window, float deltaTime);
 
 int main() {
 
@@ -182,17 +194,6 @@ int main() {
     return 1;
   }
 
-  // CAMERA SETUP
-  // camera parameters
-  glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-  glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-  glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
-  
-  // canera vectors
-  glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-  glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));  
-  glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
-
   glm::mat4 projection = glm::mat4(1.0f);
   projection = glm::perspective(glm::radians(60.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
 
@@ -218,11 +219,11 @@ int main() {
     float camZ = cos(glfwGetTime()) * radius;
 
     glm::mat4 view;
-    view = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), cameraUp);
+    view = glm::lookAt(cameraPos, cameraPos + cameraForward, cameraUp);
     shader.setMat4("view", view);
 
     // check if the escape key was pressed or the window was closed
-    processInput(window);
+    processInput(window, deltaTime);
 
     // rendering commands here
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -261,9 +262,27 @@ int main() {
   return 0;
 }
 
-void processInput(GLFWwindow *window) {
+void processInput(GLFWwindow *window, float deltaTime) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, true);
+  }
+  
+  float cameraSpeed = 10.0f * deltaTime;
+  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+    std::cout << "W key pressed" << std::endl;
+    cameraPos += cameraForward * cameraSpeed;
+  }
+  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+    std::cout << "S key pressed" << std::endl;
+    cameraPos -= cameraForward * cameraSpeed; 
+  }
+  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+    std::cout << "A key pressed" << std::endl;
+    cameraPos -= glm::normalize(glm::cross(cameraForward, cameraUp)) * cameraSpeed;
+  }
+  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+    std::cout << "D key pressed" << std::endl;
+    cameraPos += glm::normalize(glm::cross(cameraForward, cameraUp)) * cameraSpeed;
   }
 }
 
