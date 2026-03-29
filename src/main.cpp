@@ -36,14 +36,22 @@ glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
 
-// canera vectors
+// camera vectors
 glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));  
 glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
 glm::vec3 cameraForward = glm::vec3(0.0f, 0.0f, -1.0f);
 
+float lastX = WINDOW_WIDTH / 2.0f;
+float lastY = WINDOW_HEIGHT / 2.0f;
+bool firstMouse = true;
+
+float yaw = -90.0f;
+float pitch = 0.0f;
+
 void framebufferSizeCallback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window, float deltaTime);
+void mouseCallback(GLFWwindow *window, double xpos, double ypos);
 
 int main() {
 
@@ -65,7 +73,9 @@ int main() {
   // create context for the current calling thread
   glfwMakeContextCurrent(window);
   glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
-
+  glfwSetCursorPosCallback(window, mouseCallback);
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // capture the mouse cursor
+  
   if (!gladLoadGL((GLADloadfunc)glfwGetProcAddress)) {
     std::cout << "Failed to initialize GLAD" << std::endl;
     return -1;
@@ -288,4 +298,39 @@ void processInput(GLFWwindow *window, float deltaTime) {
 
 void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
   glViewport(0, 0, width, height);
+}
+
+void mouseCallback(GLFWwindow *window, double xpos, double ypos) {
+  const float sensitivity = 0.1f; // change this value to your liking
+
+  if (firstMouse) {
+    lastX = xpos;
+    lastY = ypos;
+    firstMouse = false;
+  }
+
+  float xoffset = xpos - lastX;
+  float yoffset = lastY - ypos;							// reversed since y-coordinates go from bottom to top
+  lastX = xpos;
+  lastY = ypos;
+
+  xoffset *= sensitivity;
+  yoffset *= sensitivity;
+  
+  yaw += xoffset;
+  pitch += yoffset;
+
+  // constraint pitch
+  if (pitch > 89.0f)
+    pitch = 89.0f;
+  if (pitch < -89.0f)
+    pitch = -89.0f;
+
+  glm::vec3 direction = glm::vec3(
+	cos(glm::radians(yaw)) * cos(glm::radians(pitch)),
+	sin(glm::radians(pitch)),
+	sin(glm::radians(yaw)) * cos(glm::radians(pitch))
+  );
+
+  cameraForward = glm::normalize(direction);
 }
