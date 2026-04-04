@@ -204,14 +204,19 @@ int main() {
     // return 1;
     //   }
 
-    // camera funk
     shader.use();
-    shader.setInt("ourTexture", 0);
-    shader.setInt("ourTexture2", 1);
 
-    shader.setVec3("objectColor", coral);
-    shader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-	
+	// set material properties
+	shader.setVec3("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
+	shader.setVec3("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f));
+	shader.setVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+	shader.setFloat("material.shininess", 32.0f);
+
+	// set light properties
+	shader.setVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+	shader.setVec3("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
+	shader.setVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+
     float prevTime = glfwGetTime();
     float deltaTime = 0.0f;
     float angle = 0.0f;
@@ -247,7 +252,7 @@ int main() {
 
         glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, lightPos);
-
+		
         lightShader.use();
         lightShader.setMat4("model", model);
         lightShader.setMat4("view", view);
@@ -256,7 +261,16 @@ int main() {
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         shader.use();
-		shader.setVec3("lightPos", lightPos);
+		shader.setVec3("light.position", lightPos);
+
+		glm::vec3 lightColor;
+		lightColor.x = sin(glfwGetTime() * 2.0f);
+		lightColor.y = sin(glfwGetTime() * 0.7f);
+		lightColor.z = sin(glfwGetTime() * 1.3f);
+
+		shader.setVec3("light.ambient", lightColor * glm::vec3(0.2f));
+		shader.setVec3("light.diffuse", lightColor * glm::vec3(0.5f));
+		shader.setVec3("light.specular", lightColor * glm::vec3(1.0f));
 		shader.setVec3("viewPos", camera.CameraPos);
         glBindVertexArray(VAO);
         for (unsigned int i = 0; i < 10; i++) {

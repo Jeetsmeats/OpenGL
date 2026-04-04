@@ -49,3 +49,6 @@ include/
 
 # Resource Files
 resources/
+
+compile_commands.json
+__cmake_systeminformation/
