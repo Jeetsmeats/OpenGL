@@ -257,15 +257,13 @@ int main() {
 
         shader.use();
 		shader.setVec3("lightPos", lightPos);
+		shader.setVec3("viewPos", camera.CameraPos);
         glBindVertexArray(VAO);
         for (unsigned int i = 0; i < 10; i++) {
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, cubePositions[i]);
-            float angle = 20.0f * (i + 1); // unique angle for each cube 
-            model =
-                glm::rotate(model, (float)glfwGetTime() * glm::radians(angle),
-                            glm::vec3(1.0f, 0.3f, 0.5f));
             shader.setMat4("model", model);
+            shader.setMat3("normalMatrix", glm::mat3(glm::transpose(glm::inverse(model))));
             glDrawArrays(GL_TRIANGLES, 0, 36); // update buffers
         }
 
@@ -293,7 +291,7 @@ void processInput(GLFWwindow *window, float deltaTime) {
         glfwSetWindowShouldClose(window, true);
     }
 
-    float cameraSpeed = 50.0f * deltaTime;
+    float cameraSpeed = 10.0f * deltaTime;
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
         camera.CameraPos += camera.CameraFront * cameraSpeed;
     }
