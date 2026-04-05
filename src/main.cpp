@@ -168,7 +168,10 @@ int main() {
 	shader.setVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
 	shader.setVec3("light.diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
 	shader.setVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
-	shader.setVec3("light.direction", glm::vec3(-0.5f, -0.5f, -0.5f));
+	shader.setFloat("light.constant", 1.0f);
+	shader.setFloat("light.linear", 0.09f);
+	shader.setFloat("light.quadratic", 0.032f);
+
     float prevTime = glfwGetTime();
     float deltaTime = 0.0f;
     float angle = 0.0f;
@@ -202,20 +205,21 @@ int main() {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// glm::vec3 lightPos = glm::vec3(radius * cos(cameraAngle), 1.0f, radius * sin(cameraAngle));
-        // glm::mat4 model = glm::mat4(1.0f);
-		// model = glm::translate(model, lightPos);
+		glm::vec3 lightPos = glm::vec3(radius * cos(cameraAngle), 1.0f, radius * sin(cameraAngle));
+        glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, lightPos);
 		
-        // lightShader.use();
-        // lightShader.setMat4("model", model);
-        // lightShader.setMat4("view", view);
-        // lightShader.setMat4("projection", perspective);
-        // glBindVertexArray(lightVAO);
-        // glDrawArrays(GL_TRIANGLES, 0, 36);
+        lightShader.use();
+        lightShader.setMat4("model", model);
+        lightShader.setMat4("view", view);
+        lightShader.setMat4("projection", perspective);
+        glBindVertexArray(lightVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
         shader.use();
 		// shader.setVec3("light.position", lightPos);
 		shader.setVec3("viewPos", camera.CameraPos);
+		shader.setVec3("light.position", lightPos);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, diffuseMap);
