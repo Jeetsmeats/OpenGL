@@ -120,8 +120,7 @@ int main() {
 	};
 
     Shader shader = Shader(VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH);
-    Shader lightShader =
-        Shader(VERTEX_SHADER_LIGHT_PATH, FRAGMENT_SHADER_LIGHT_PATH);
+    Shader lightShader = Shader(VERTEX_SHADER_LIGHT_PATH, FRAGMENT_SHADER_LIGHT_PATH);
 
     unsigned int VBO, VAO;
 
@@ -163,14 +162,13 @@ int main() {
 	// set material properties
 	shader.setInt("material.diffuse", 0);
 	shader.setInt("material.specular", 1);
-	shader.setVec3("material.specular", glm::vec3(0.0f, 0.0f, 0.0f));
 	shader.setFloat("material.shininess", 32.0f);
 
 	// set light properties
 	shader.setVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-	shader.setVec3("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
+	shader.setVec3("light.diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
 	shader.setVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
-
+	shader.setVec3("light.direction", glm::vec3(-0.5f, -0.5f, -0.5f));
     float prevTime = glfwGetTime();
     float deltaTime = 0.0f;
     float angle = 0.0f;
@@ -178,6 +176,8 @@ int main() {
 	float radius = 10.0f;
 
     glEnable(GL_DEPTH_TEST); 										// enable depth testing
+
+	glm::vec3 lightPos = glm::vec3(0.2f, -1.0f, -0.3f);
     while (!glfwWindowShouldClose(window)) {
 
         deltaTime = glfwGetTime() - prevTime;
@@ -202,20 +202,19 @@ int main() {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glm::vec3 lightPos = glm::vec3(radius * cos(cameraAngle), 1.0f, radius * sin(cameraAngle));
-
-        glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, lightPos);
+		// glm::vec3 lightPos = glm::vec3(radius * cos(cameraAngle), 1.0f, radius * sin(cameraAngle));
+        // glm::mat4 model = glm::mat4(1.0f);
+		// model = glm::translate(model, lightPos);
 		
-        lightShader.use();
-        lightShader.setMat4("model", model);
-        lightShader.setMat4("view", view);
-        lightShader.setMat4("projection", perspective);
-        glBindVertexArray(lightVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        // lightShader.use();
+        // lightShader.setMat4("model", model);
+        // lightShader.setMat4("view", view);
+        // lightShader.setMat4("projection", perspective);
+        // glBindVertexArray(lightVAO);
+        // glDrawArrays(GL_TRIANGLES, 0, 36);
 
         shader.use();
-		shader.setVec3("light.position", lightPos);
+		// shader.setVec3("light.position", lightPos);
 		shader.setVec3("viewPos", camera.CameraPos);
 
 		glActiveTexture(GL_TEXTURE0);

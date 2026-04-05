@@ -8,7 +8,8 @@ struct Material {
 };
 
 struct Light {
-	vec3 position;
+	// vec3 position;
+	vec3 direction;
 	vec3 ambient;
 	vec3 diffuse;
 	vec3 specular;
@@ -32,7 +33,8 @@ void main() {
 
 	// calculate the light direction
 	vec3 norm = normalize(Normal);
-	vec3 lightDir = normalize(light.position - FragPos);	
+	// vec3 lightDir = normalize(light.position - FragPos);	
+	vec3 lightDir = normalize(-light.direction);
 	float diffFactor = max(dot(norm, lightDir), 0.0);
 
 	// calculate the view direction and reflection direction for specular lighting
