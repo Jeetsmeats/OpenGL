@@ -2,15 +2,13 @@
 
 // Fragment shader for lighting calculations
 struct Material {
-	vec3 ambient;
-	vec3 diffuse;
-	vec3 specular;
+	sampler2D diffuse;
+	sampler2D specular;
 	float shininess;
 };
 
 struct Light {
 	vec3 position;
-
 	vec3 ambient;
 	vec3 diffuse;
 	vec3 specular;
@@ -20,6 +18,7 @@ out vec4 FragColor;
 
 in vec3 Normal;
 in vec3 FragPos;
+in vec2 TexCoords;
 
 uniform vec3 objectColor;
 uniform vec3 lightColor;
@@ -31,21 +30,25 @@ uniform Material material;
 
 void main() {
 
-	// ambient lighting
-	vec3 ambient = light.ambient * material.ambient; // set all 3 vector values to 1.0
-
-	// diffuse lighting
+	// calculate the light direction
 	vec3 norm = normalize(Normal);
-	vec3 lightDir = normalize(light.position - FragPos); // light position - fragment position
+	vec3 lightDir = normalize(light.position - FragPos);	
 	float diffFactor = max(dot(norm, lightDir), 0.0);
-	vec3 diffuse = diffFactor * light.diffuse * material.diffuse;
 
-	// specular lighting
+	// calculate the view direction and reflection direction for specular lighting
 	vec3 viewDir = normalize(viewPos - FragPos);
 	vec3 reflectDir = reflect(-lightDir, norm);
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-	vec3 specular = light.specular * (spec * material.specular);
+
+	// ambient lighting
+	vec3 ambient = light.ambient * vec3(texture(material.diffuse, TexCoords)); 					
+
+	// diffuse lighting
+	vec3 diffuse = diffFactor * light.diffuse * vec3(texture(material.diffuse, TexCoords));;
+
+	// specular lighting
+	vec3 specular = light.specular * (spec * vec3(texture(material.specular, TexCoords)));
 
 	vec3 result = diffuse + ambient + specular;
-	FragColor = vec4(result, 1.0); // set all 4 vector values to 1.0
+	FragColor = vec4(result, 1.0); 																		// set all 4 vector values to 1.0
 }

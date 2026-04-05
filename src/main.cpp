@@ -18,8 +18,8 @@
 #include "Shader.h"
 #include "stb_image.h"
 
-const std::string containerPath = PROJECT_ROOT "/resources/container.jpg";
-const std::string awesomeFacePath = PROJECT_ROOT "/resources/awesomeface.png";
+const std::string containerPath = PROJECT_ROOT "/resources/container2.png";
+const std::string containerSpecularPath = PROJECT_ROOT "/resources/container2_specular.png";
 
 glm::vec3 coral(1.0f, 0.5f, 0.31f);
 glm::vec3 toyColor(0.0f, 0.5f, 0.31f);
@@ -43,6 +43,7 @@ void framebufferSizeCallback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window, float deltaTime);
 void mouseCallback(GLFWwindow *window, double xpos, double ypos);
 void scrollCallback(GLFWwindow *window, double xoffset, double yoffset);
+unsigned int loadTexture(const std::string &path);
 
 int main() {
 
@@ -133,83 +134,36 @@ int main() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
-                          (void *)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),(void *)0);
     glEnableVertexAttribArray(0);
 
     // normal attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
-                          (void *)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
+	// texture coordinate attribute
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+
+	// set up light VAO
     unsigned int lightVAO;
     glGenVertexArrays(1, &lightVAO);
     glBindVertexArray(lightVAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
-                          (void *)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
 
-    //   unsigned int texture1, texture2;
-
-    //   load textures
-    //   int width, height, nrChannels;
-    //   unsigned char *data = stbi_load(containerPath.c_str(), &width, &height,
-    //   &nrChannels, 0);
-
-    //   glGenTextures(1, &texture1);
-    //   glBindTexture(GL_TEXTURE_2D, texture1);
-
-    //   texture wrapping
-    //   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-    //   GL_REPEAT); // set texture wrapping parameters
-    //   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    //   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-    //   GL_LINEAR); // set texture filtering parameters
-    //   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    //   if (data) {
-    // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
-    //  GL_UNSIGNED_BYTE, data);
-    // glGenerateMipmap(GL_TEXTURE_2D);
-
-    // stbi_image_free(data);
-    //   } else {
-    // std::cout << "Failed to load texture1: " << stbi_failure_reason() <<
-    // std::endl; return 1;
-    //   }
-
-    //   glGenTextures(1, &texture2);
-    //   glBindTexture(GL_TEXTURE_2D, texture2);
-
-    //   texture wrapping
-    //   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-    //   GL_REPEAT); // set texture wrapping parameters
-    //   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    //   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-    //   GL_LINEAR); // set texture filtering parameters
-    //   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    //   stbi_set_flip_vertically_on_load(true); // flip the texture on load
-    //   unsigned char *data2 = stbi_load(awesomeFacePath.c_str(), &width,
-    //   &height, &nrChannels, 0); if (data2) {
-    // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
-    //  GL_UNSIGNED_BYTE, data2);
-    // glGenerateMipmap(GL_TEXTURE_2D);
-
-    // stbi_image_free(data2); // free image data after generating texture
-    //   } else {
-    // std::cout << "Failed to load texture2" << std::endl;
-    // return 1;
-    //   }
-
+	unsigned int diffuseMap = loadTexture(containerPath);
+	unsigned int specularMap = loadTexture(containerSpecularPath);
+	if (diffuseMap == 0 || specularMap == 0) return 1;
+	
     shader.use();
-
+	
 	// set material properties
-	shader.setVec3("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
-	shader.setVec3("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f));
-	shader.setVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+	shader.setInt("material.diffuse", 0);
+	shader.setInt("material.specular", 1);
+	shader.setVec3("material.specular", glm::vec3(0.0f, 0.0f, 0.0f));
 	shader.setFloat("material.shininess", 32.0f);
 
 	// set light properties
@@ -262,16 +216,12 @@ int main() {
 
         shader.use();
 		shader.setVec3("light.position", lightPos);
-
-		glm::vec3 lightColor;
-		lightColor.x = sin(glfwGetTime() * 2.0f);
-		lightColor.y = sin(glfwGetTime() * 0.7f);
-		lightColor.z = sin(glfwGetTime() * 1.3f);
-
-		shader.setVec3("light.ambient", lightColor * glm::vec3(0.2f));
-		shader.setVec3("light.diffuse", lightColor * glm::vec3(0.5f));
-		shader.setVec3("light.specular", lightColor * glm::vec3(1.0f));
 		shader.setVec3("viewPos", camera.CameraPos);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, diffuseMap);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, specularMap);
         glBindVertexArray(VAO);
         for (unsigned int i = 0; i < 10; i++) {
             glm::mat4 model = glm::mat4(1.0f);
@@ -290,8 +240,8 @@ int main() {
     glDeleteBuffers(1, &VBO);
 
     glDeleteVertexArrays(1, &lightVAO);
-    //   glDeleteTextures(1, &texture1);
-    //   glDeleteTextures(1, &texture2);
+	glDeleteTextures(1, &diffuseMap);
+	glDeleteTextures(1, &specularMap);
 
     shader.deleteShader();
     lightShader.deleteShader();
@@ -334,4 +284,30 @@ void mouseCallback(GLFWwindow *window, double xpos, double ypos) {
 
 void scrollCallback(GLFWwindow *window, double xoffset, double yoffset) {
     camera.scrollCallback(window, xoffset, yoffset);
+}
+
+unsigned int loadTexture(const std::string &path) {
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    int width, height, nrChannels;
+    unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
+    if (data) {
+        GLenum format = (nrChannels == 4) ? GL_RGBA : GL_RGB;
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        stbi_image_free(data);
+    } else {
+        std::cout << "Failed to load texture: " << path << " - " << stbi_failure_reason() << std::endl;
+        glDeleteTextures(1, &textureID);
+        return 0;
+    }
+
+    return textureID;
 }
