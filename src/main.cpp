@@ -165,12 +165,26 @@ int main() {
 	shader.setFloat("material.shininess", 32.0f);
 
 	// set light properties
-	shader.setVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-	shader.setVec3("light.diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
-	shader.setVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
-	shader.setFloat("light.constant", 1.0f);
-	shader.setFloat("light.linear", 0.09f);
-	shader.setFloat("light.quadratic", 0.032f);
+	shader.setVec3("pointLight.ambient", glm::vec3(0.02f, 0.02f, 0.02f));
+	shader.setVec3("pointLight.diffuse", glm::vec3(0.2f, 0.2f, 0.2f));
+	shader.setVec3("pointLight.specular", glm::vec3(0.2f, 0.2f, 0.2f));
+	shader.setFloat("pointLight.constant", 1.0f);
+	shader.setFloat("pointLight.linear", 0.09f);
+	shader.setFloat("pointLight.quadratic", 0.032f);
+
+	// set directional light properties
+	shader.setVec3("dirLight.direction", glm::vec3(-0.5f, -0.5f, -0.5f));
+	shader.setVec3("dirLight.ambient", glm::vec3(0.01f, 0.01f, 0.01f));
+	shader.setVec3("dirLight.diffuse", glm::vec3(0.05f, 0.05f, 0.05f));
+	shader.setVec3("dirLight.specular", glm::vec3(0.05f, 0.05f, 0.05f));
+
+	// set spot light properties
+	shader.setVec3("spotLight.ambient", glm::vec3(0.0f, 0.0f, 0.0f));
+	shader.setVec3("spotLight.diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
+	shader.setVec3("spotLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+	shader.setFloat("spotLight.constant", 1.0f);
+	shader.setFloat("spotLight.linear", 0.027f);
+	shader.setFloat("spotLight.quadratic", 0.0028f);
 
     float prevTime = glfwGetTime();
     float deltaTime = 0.0f;
@@ -180,7 +194,6 @@ int main() {
 
     glEnable(GL_DEPTH_TEST); 										// enable depth testing
 
-	glm::vec3 lightPos = glm::vec3(0.2f, -1.0f, -0.3f);
     while (!glfwWindowShouldClose(window)) {
 
         deltaTime = glfwGetTime() - prevTime;
@@ -217,9 +230,11 @@ int main() {
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         shader.use();
-		// shader.setVec3("light.position", lightPos);
 		shader.setVec3("viewPos", camera.CameraPos);
-		shader.setVec3("light.position", lightPos);
+		shader.setVec3("spotLight.position", camera.CameraPos);
+		shader.setVec3("spotLight.direction", camera.CameraFront);
+		shader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
+		shader.setVec3("pointLight.position", lightPos);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, diffuseMap);
