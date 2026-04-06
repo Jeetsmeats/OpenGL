@@ -51,7 +51,7 @@ uniform vec3 objectColor;
 uniform vec3 lightColor;
 
 // light properies
-uniform PointLight light;
+uniform PointLight pointLight;
 uniform DirectionalLight dirLight;
 uniform SpotLight spotLight;
 
@@ -67,7 +67,7 @@ void main() {
 
 	vec3 spotLightResult = CalcSpotLight(spotLight);
 	vec3 dirLightResult = CalcDirLight(dirLight);
-	vec3 pointLightResult = CalcPointLight(light);
+	vec3 pointLightResult = CalcPointLight(pointLight);
 
 	vec3 result = spotLightResult + dirLightResult + pointLightResult;
 	FragColor = vec4(result, 1.0); 																		// set all 4 vector values to 1.0

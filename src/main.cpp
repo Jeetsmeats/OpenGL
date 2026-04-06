@@ -166,16 +166,16 @@ int main() {
 
 	// set light properties
 	shader.setVec3("pointLight.ambient", glm::vec3(0.02f, 0.02f, 0.02f));
-	shader.setVec3("pointLight.diffuse", glm::vec3(0.2f, 0.2f, 0.2f));
+	shader.setVec3("pointLight.diffuse", glm::vec3(0.6f, 0.6f, 0.6f));
 	shader.setVec3("pointLight.specular", glm::vec3(0.2f, 0.2f, 0.2f));
 	shader.setFloat("pointLight.constant", 1.0f);
-	shader.setFloat("pointLight.linear", 0.09f);
-	shader.setFloat("pointLight.quadratic", 0.032f);
+	shader.setFloat("pointLight.linear", 0.027f);
+	shader.setFloat("pointLight.quadratic", 0.0028f);
 
 	// set directional light properties
 	shader.setVec3("dirLight.direction", glm::vec3(-0.5f, -0.5f, -0.5f));
 	shader.setVec3("dirLight.ambient", glm::vec3(0.01f, 0.01f, 0.01f));
-	shader.setVec3("dirLight.diffuse", glm::vec3(0.05f, 0.05f, 0.05f));
+	shader.setVec3("dirLight.diffuse", glm::vec3(0.4f, 0.4f, 0.4f));
 	shader.setVec3("dirLight.specular", glm::vec3(0.05f, 0.05f, 0.05f));
 
 	// set spot light properties
