@@ -199,7 +199,7 @@ int main() {
         deltaTime = glfwGetTime() - prevTime;
         prevTime = glfwGetTime();
 
-        float cameraAngle = (float)glfwGetTime() * rotationSpeed;
+        float cameraAngle = (float) glfwGetTime() * rotationSpeed;
 		
         glm::mat4 view = camera.calculateLookAt();
         glm::mat4 perspective = glm::perspective(

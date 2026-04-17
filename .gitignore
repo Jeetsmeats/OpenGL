@@ -52,3 +52,5 @@ resources/
 
 compile_commands.json
 __cmake_systeminformation/
+
+tools/
