@@ -45,7 +45,11 @@ Makefile
 *.vcxproj.filters
 
 # Libraries
-include/
+include/glad
+include/glfw
+include/glm
+include/KHR
+include/lib
 
 # Resource Files
 resources/
