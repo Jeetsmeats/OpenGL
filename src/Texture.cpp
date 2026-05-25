@@ -11,18 +11,19 @@
 // defined libraries 
 #include "Texture.h"
 
-Texture::Texture() : _textureId(0) {}
+Texture::Texture() : textureId(0) {}
 
 unsigned int Texture::loadTexture(const std::string &path) {
-    unsigned int textureID;
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_2D, textureID);
+    glGenTextures(1, &this->textureId);
+    glBindTexture(GL_TEXTURE_2D, this->textureId);
 
+	// texture settings
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+	// load texture onto gpu
     int width, height, nrChannels;
     unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
     if (data) {
@@ -32,10 +33,9 @@ unsigned int Texture::loadTexture(const std::string &path) {
         stbi_image_free(data);
     } else {
         std::cout << "Failed to load texture: " << path << " - " << stbi_failure_reason() << std::endl;
-        glDeleteTextures(1, &textureID);
+        glDeleteTextures(1, &this->textureId);
         return 0;
     }
 
-    _textureId = textureID;
-    return _textureId;
+    return this->textureId;
 }
