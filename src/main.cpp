@@ -16,6 +16,7 @@
 
 #include "Camera.h"
 #include "Shader.h"
+#include "Texture.h"
 #include "stb_image.h"
 
 const std::string containerPath = PROJECT_ROOT "/resources/container2.png";
@@ -153,9 +154,11 @@ int main() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
 
-	unsigned int diffuseMap = loadTexture(containerPath);
-	unsigned int specularMap = loadTexture(containerSpecularPath);
-	if (diffuseMap == 0 || specularMap == 0) return 1;
+	Texture diffuseMap = Texture();
+	Texture specularMap = Texture();
+	diffuseMap.loadTexture(containerPath);
+	specularMap.loadTexture(containerSpecularPath);
+	if (diffuseMap.textureId == 0 || specularMap.textureId == 0) return 1;
 	
     shader.use();
 	
@@ -237,9 +240,9 @@ int main() {
 		shader.setVec3("pointLight.position", lightPos);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, diffuseMap);
+		glBindTexture(GL_TEXTURE_2D, diffuseMap.textureId);
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, specularMap);
+		glBindTexture(GL_TEXTURE_2D, specularMap.textureId);
         glBindVertexArray(VAO);
         for (unsigned int i = 0; i < 10; i++) {
             glm::mat4 model = glm::mat4(1.0f);
@@ -258,8 +261,8 @@ int main() {
     glDeleteBuffers(1, &VBO);
 
     glDeleteVertexArrays(1, &lightVAO);
-	glDeleteTextures(1, &diffuseMap);
-	glDeleteTextures(1, &specularMap);
+	glDeleteTextures(1, &diffuseMap.textureId);
+	glDeleteTextures(1, &specularMap.textureId);
 
     shader.deleteShader();
     lightShader.deleteShader();
