@@ -16,10 +16,12 @@ void Mesh::setupMesh() {
 	glGenBuffers(1, &this->_EBO);
 
 	glBindVertexArray(this->_VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, this->_VBO);
 
+	// bind vertex buffer
+	glBindBuffer(GL_ARRAY_BUFFER, this->_VBO);
 	glBufferData(GL_ARRAY_BUFFER, this->vertices.size() * sizeof(Vertex), &this->vertices[0], GL_STATIC_DRAW);
 
+	// bind index buffer
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->_EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->indices.size() * sizeof(unsigned int), &this->indices[0], GL_STATIC_DRAW);
 

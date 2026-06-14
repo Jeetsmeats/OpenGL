@@ -14,6 +14,8 @@ project(OPENGL)
 enable_language(C)
 enable_language(CXX)
 
+find_package(assimp REQUIRED)
+
 set(SOURCES
  "src/main.cpp"
  "src/glad.c"

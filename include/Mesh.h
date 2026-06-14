@@ -1,10 +1,10 @@
 #include <vector>
-#include <string>
 #include "Shader.h"
 #include "Texture.h"
 
 #ifndef __MESH_H__
 #define __MESH_H__
+
 struct Vertex {
 	glm::vec3 Position;
 	glm::vec3 Normal;
@@ -24,7 +24,7 @@ public:
 	/// @param indices The indices for indexed drawing
 	/// @param textures The textures associated with the mesh
 	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
-	
+
 	/// @brief Draws the mesh using the provided shader
 	/// @param shader The shader to use for drawing the mesh
 	void Draw(Shader& shader);
