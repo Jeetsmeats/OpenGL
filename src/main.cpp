@@ -74,8 +74,7 @@ int main() {
 
   int nrAttributes;
   glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
-  std::cout << "Maximum number of vertex attributes supported: " << nrAttributes
-            << std::endl;
+  std::cout << "Maximum number of vertex attributes supported: " << nrAttributes << std::endl;
 
   // set of vertices
   float vertices[] = {
