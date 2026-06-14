@@ -65,8 +65,7 @@ int main() {
   glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
   glfwSetCursorPosCallback(window, mouseCallback);
   glfwSetScrollCallback(window, scrollCallback);
-  glfwSetInputMode(window, GLFW_CURSOR,
-                   GLFW_CURSOR_DISABLED); // capture the mouse cursor
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);              // capture the mouse cursor
 
   if (!gladLoadGL()) {
     std::cout << "Failed to initialize GLAD" << std::endl;

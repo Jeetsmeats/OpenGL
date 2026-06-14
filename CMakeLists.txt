@@ -14,8 +14,6 @@ project(OPENGL)
 enable_language(C)
 enable_language(CXX)
 
-find_package(assimp REQUIRED)
-
 set(SOURCES
  "src/main.cpp"
  "src/glad.c"
@@ -29,10 +27,6 @@ add_executable(OPENGL ${SOURCES})
 target_include_directories(OPENGL PUBLIC
  "src/"
  "include/"
-)
-
-target_link_directories(OPENGL PRIVATE
- "lib/"
 )
 
 target_link_libraries(OPENGL
