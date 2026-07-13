@@ -163,7 +163,7 @@ int main() {
   Texture specularMap = Texture();
   diffuseMap.loadTexture(containerPath);
   specularMap.loadTexture(containerSpecularPath);
-  if (diffuseMap.textureId == 0 || specularMap.textureId == 0)
+  if (diffuseMap.id == 0 || specularMap.id == 0)
     return 1;
 
   shader.use();
@@ -246,9 +246,9 @@ int main() {
     shader.setVec3("pointLight.position", lightPos);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, diffuseMap.textureId);
+    glBindTexture(GL_TEXTURE_2D, diffuseMap.id);
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, specularMap.textureId);
+    glBindTexture(GL_TEXTURE_2D, specularMap.id);
     glBindVertexArray(VAO);
     for (unsigned int i = 0; i < 10; i++) {
       glm::mat4 model = glm::mat4(1.0f);
@@ -268,8 +268,8 @@ int main() {
   glDeleteBuffers(1, &VBO);
 
   glDeleteVertexArrays(1, &lightVAO);
-  glDeleteTextures(1, &diffuseMap.textureId);
-  glDeleteTextures(1, &specularMap.textureId);
+  glDeleteTextures(1, &diffuseMap.id);
+  glDeleteTextures(1, &specularMap.id);
 
   shader.deleteShader();
   lightShader.deleteShader();

@@ -1,13 +1,15 @@
 #ifndef __TEXTURE_H__
 #define __TEXTURE_H__
 
+#include <assimp/scene.h>
 #include <string>
 
 class Texture {
 public:
 
-	unsigned int textureId;
+	unsigned int id;
 	std::string type;
+	aiString path;
 
 	Texture();
 

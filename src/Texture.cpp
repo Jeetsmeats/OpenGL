@@ -8,14 +8,14 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "stb_image.h"
 
-// defined libraries 
+// defined libraries
 #include "Texture.h"
 
-Texture::Texture() : textureId(0) {}
+Texture::Texture() : id(0) {}
 
 unsigned int Texture::loadTexture(const std::string &path) {
-    glGenTextures(1, &this->textureId);
-    glBindTexture(GL_TEXTURE_2D, this->textureId);
+    glGenTextures(1, &this->id);
+    glBindTexture(GL_TEXTURE_2D, this->id);
 
 	// texture settings
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -33,9 +33,9 @@ unsigned int Texture::loadTexture(const std::string &path) {
         stbi_image_free(data);
     } else {
         std::cout << "Failed to load texture: " << path << " - " << stbi_failure_reason() << std::endl;
-        glDeleteTextures(1, &this->textureId);
+        glDeleteTextures(1, &this->id);
         return 0;
     }
 
-    return this->textureId;
+    return this->id;
 }

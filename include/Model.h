@@ -26,7 +26,6 @@ private:
     /// @param scene The scene containing the node.
     void processNode(aiNode *node, const aiScene *scene);
 
-
     /// @brief Processes a mesh in the scene.
     /// @param mesh The mesh to process.
     /// @param scene The scene containing the mesh.
