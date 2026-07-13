@@ -90,7 +90,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
         mat->GetTexture(type, i, &str);
 
         Texture texture;
-        texture.id = TextureFromFile(str.C_Str(), _dir);
+        texture.id = texture.loadTexture(_dir + "/" + str.C_Str());
         texture.type = typeName;
         texture.path = str;
 
