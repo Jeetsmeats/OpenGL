@@ -23,6 +23,8 @@ set(SOURCES
  "src/Camera.cpp"
  "src/Texture.cpp"
  "src/Mesh.cpp"
+ "src/Model.cpp"
+ "src/GLDebug.cpp"
 )
 add_executable(OPENGL ${SOURCES})
 

@@ -27,8 +27,22 @@ unsigned int Texture::loadTexture(const std::string &path) {
     int width, height, nrChannels;
     unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
     if (data) {
-        GLenum format = (nrChannels == 4) ? GL_RGBA : GL_RGB;
+        GLenum format;
+        if (nrChannels == 1)
+            format = GL_RED;        // e.g. greyscale specular / roughness maps
+        else if (nrChannels == 4)
+            format = GL_RGBA;
+        else
+            format = GL_RGB;
+        // GL assumes each pixel row starts on a 4-byte boundary. RGB/RED rows
+        // of odd widths don't, which shears the texture diagonally.
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        if (format == GL_RED) {
+            // sample as (r, r, r, 1) so vec3(texture(...)) stays grey, not red
+            GLint swizzle[] = {GL_RED, GL_RED, GL_RED, GL_ONE};
+            glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzle);
+        }
         glGenerateMipmap(GL_TEXTURE_2D);
         stbi_image_free(data);
     } else {

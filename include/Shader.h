@@ -1,6 +1,7 @@
 #ifndef __SHADER_H__
 #define __SHADER_H__
 
+#include <filesystem>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <stdint.h>
@@ -22,6 +23,18 @@ public:
 
   // @brief Delete the shader
   void deleteShader();
+
+  // @brief Recompile the program from its source files.
+  //        On failure the previous (working) program is kept and the error is
+  //        printed, so a typo in a shader never leaves you with a black screen.
+  //        NOTE: uniforms belong to a program object, so a new program starts
+  //        with every uniform reset to 0 - re-set them after a reload.
+  // @return true if a new program was built and swapped in
+  bool reload();
+
+  // @brief Reload if either source file was saved since the last build.
+  // @return true if a new program was swapped in (re-set your uniforms!)
+  bool reloadIfChanged();
 
   // @brief Set a boolean uniform in the shader
   // @param name  Name of the uniform variable
@@ -52,5 +65,18 @@ public:
   // @param name Name of the uniform variable
   // @param value Reference to a glm::vec3 representing the vector
   void setVec3(const std::string &name, const glm::vec3 value) const;
+
+private:
+  std::string _vertexPath;
+  std::string _fragmentPath;
+  std::filesystem::file_time_type _vertexTime;
+  std::filesystem::file_time_type _fragmentTime;
+
+  // @brief Read, compile and link both stages.
+  // @return the new program ID, or 0 on any failure (errors are printed)
+  unsigned int build() const;
+
+  // @brief Record the current modification times of both source files
+  void stampFileTimes();
 };
 #endif // __SHADER_H__

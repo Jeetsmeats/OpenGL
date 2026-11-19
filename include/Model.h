@@ -5,6 +5,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include <cstring>
 #include <string>
 #include <vector>
 
@@ -16,10 +17,11 @@ private:
 
     std::vector<Mesh> _meshes;
     std::string _dir;
+    std::vector<Texture> _loadedTextures;   // textures already on the GPU
 
     /// @brief Loads a model from a given path.
     /// @param path The path to the model file.
-    void loadModel(std::string path);
+    void loadModel(const std::string &path);
 
     /// @brief Processes a node in the scene.
     /// @param node The node to process.
@@ -40,7 +42,7 @@ public:
 
     /// @brief Constructs a Model from a given path.
     /// @param path The path to the model file.
-    Model(char *path);
+    Model(const std::string &path);
 
     /// @brief Draws the model using the given shader.
     /// @param shader The shader to use for drawing.
